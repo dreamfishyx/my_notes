@@ -1,0 +1,231 @@
+/*
+
+This CSS file will be included with your plugin, and
+available in the app when your plugin is enabled.
+
+If your plugin does not need CSS, delete this file.
+
+*/
+
+.imgk-plugin-export-canvas {
+	pointer-events: none;
+	opacity: 0;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+}
+
+canvas.imgk-plugin-item:not([width]) {
+	max-width: 100%;
+}
+
+canvas.imgk-plugin-item {
+	pointer-events: none;
+	opacity: 0;
+}
+
+img.imgk-plugin-item:not([width]) {
+	max-width: 100%;
+}
+
+.view-content .imgk-view-tools {
+	/* position: absolute; */
+	background-color: blue;
+}
+
+.view-content:hover .imgk-view-tools {
+	background-color: red;
+}
+
+.workspace-leaf-content
+	.internal-embed
+	img.imgk-plugin-fit-max-height:not([height]) {
+	max-height: 100%;
+}
+
+.internal-embed:has(.imgk-plugin-overlay) {
+	padding: 0px;
+}
+
+/* An follower for <img>. Tweaks drag and drop with overriding "src" attribute of target <img>  */
+/* .internal-embed .imgk-plugin-overlay { */
+.imgk-plugin-overlay {
+	/* position: fixed; */
+	position: absolute;
+	/* display: block; */
+	display: inline-block;
+	left: 0;
+	top: 0;
+	cursor: pointer;
+
+	/* background-color: red;
+	opacity: 0.8; */
+
+	/* right: 0; */
+	/* bottom: 0; */
+}
+
+.imgk-plugin-overlay-dot {
+	position: absolute;
+	display: inline-block;
+	left: 0px;
+	top: 0px;
+	width: 0px;
+	height: 0px;
+	pointer-events: none;
+	opacity: 0;
+}
+
+.setting-item .setting-item-control .imgk-textarea {
+	flex-grow: 1;
+	/* min-height: 100px; */
+	/* height: 100px; */
+	/* min-width: 300px; */
+}
+
+.setting-item .setting-item-control .imgk-warning {
+	border-color: var(--text-warning);
+}
+
+.setting-item .imgk-settings-quality {
+	min-width: 50px;
+}
+
+.setting-item.imgk-no-border {
+	border: none;
+}
+
+.setting-item.imgk-settings-group-member {
+	border: none;
+	padding: 0.2em 0;
+}
+
+.setting-item.imgk-settings-group-member-first {
+	padding-bottom: 0.2em;
+}
+
+.setting-item.imgk-settings-group-member-last {
+	border: none;
+	padding-top: 0.2em;
+}
+
+.setting-item .imgk-size-input {
+	min-width: 100px;
+	width: 100px;
+	text-align: center;
+}
+
+.setting-item.imgk-settings-indent-1 {
+	/* padding-left: 1em; */
+	/* margin-block-start: 3em; */
+	margin-left: 1.5em;
+}
+
+.setting-item.imgk-settings-indent-heading-1 {
+	/* padding-left: 1em; */
+	/* margin-block-start: 3em; */
+	margin-left: 1.5em;
+	margin-top: 0em;
+}
+
+.setting-item.imgk-controls-only .setting-item-info {
+	display: none;
+}
+
+.setting-item.imgk-controls-only .setting-item-control {
+	flex-grow: 1;
+}
+
+.setting-item.imgk-wide-controls .setting-item-control {
+	flex-grow: 1;
+}
+
+.setting-item input.imgk-wide-input {
+	flex-grow: 1;
+}
+
+.setting-item input.imgk-narrow-input {
+	min-width: 70px;
+	width: 70px;
+	text-align: center;
+}
+
+.setting-item .imgk-fill-space {
+	flex-grow: 1;
+}
+
+/* .setting-item .setting-item-control button:has([disabled]) {
+	opacity: 0.5;
+} */
+
+.imgk-custom-setting-item:has(.setting-item) {
+	/* display: block; */
+	padding: 0.75em 0;
+	border-top: 0px solid var(--background-modifier-border);
+}
+
+.imgk-custom-setting-item .setting-item {
+	border-top: 0px;
+}
+
+.setting-item .imgk-toggle-off {
+	opacity: 0.3;
+}
+
+.setting-item.imgk-warning * {
+	color: #cc0000;
+}
+
+.imgk-export-supporter {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.imgk-disabled {
+	opacity: 0.3;
+	pointer-events: none;
+}
+
+.file-embed-title.imgk-plugin-hidden {
+	height: 0px;
+	opacity: 0;
+	pointer-events: none;
+}
+
+/* In excalidraw, treat vertical overflow. */
+.workspace.imgk-plugin-treat-vertical-overflow
+	.workspace-leaf-content
+	.excalidraw__embeddable-container
+	.image-container
+	img.imgk-plugin-item {
+	max-height: 100%;
+	max-width: 100%;
+	width: 100%;
+	height: 100%;
+}
+
+.workspace.imgk-plugin-treat-vertical-overflow
+	.workspace-leaf-content
+	.view-content
+	.excalidraw__embeddable-container
+	.image-container:has(img.imgk-plugin-item) {
+	height: 100%;
+	width: 100%;
+}
+
+/* .workspace.imgk-plugin-treat-vertical-overflow
+	.workspace-leaf-content
+	.excalidraw__embeddable-container
+	.image-container
+	img:not([height]) {
+	max-height: 100%;
+	max-width:100%;
+}
+
+.workspace.imgk-plugin-treat-vertical-overflow
+	.workspace-leaf-content
+	.view-content
+	.excalidraw__embeddable-container
+	.image-container:has(img:not([height])) {
+	height: 100%;
+} */

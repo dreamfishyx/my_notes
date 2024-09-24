@@ -1,0 +1,213 @@
+{
+  "main": {
+    "id": "c4a5ce7e15c0b4c7",
+    "type": "split",
+    "children": [
+      {
+        "id": "d757738f60dcacae",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ee326e4f12498358",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "e1c369039d7591f3",
+    "type": "split",
+    "children": [
+      {
+        "id": "e2685ab16bf1519a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a802ec50c963c77b",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "1e5160efabedc09e",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "line:(栈)",
+                "matchingCase": true,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "cf86cc6c0b7bf22b",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          },
+          {
+            "id": "1d2b106cfb718b45",
+            "type": "leaf",
+            "state": {
+              "type": "file-tree-view",
+              "state": {}
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 258
+  },
+  "right": {
+    "id": "8e2279a4f99d2693",
+    "type": "split",
+    "children": [
+      {
+        "id": "a3cfa8701f44c853",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ed05e538ac9282ab",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "be94fd8aa4163fca",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "9e2ab672c0125eec",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "109f7844238ac20f",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {}
+            }
+          },
+          {
+            "id": "174c521e178ba373",
+            "type": "leaf",
+            "state": {
+              "type": "advanced-tables-toolbar",
+              "state": {}
+            }
+          },
+          {
+            "id": "899bb74203bbc2fc",
+            "type": "leaf",
+            "state": {
+              "type": "calendar",
+              "state": {}
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 346
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "markdown-importer:打开 Markdown 格式转换器": false,
+      "obsidian-excalidraw-plugin:新建绘图文件": false,
+      "publish:发布更改": true,
+      "file-tree-alternative:File Tree Alternative Plugin": false
+    }
+  },
+  "active": "ee326e4f12498358",
+  "lastOpenFiles": [
+    "vue/7.自定义事件.md",
+    "vue/2.vue2初识.md",
+    "考研/操作系统/2.数据表示与运算.md",
+    "考研/数据结构/7.排序.md",
+    "考研/数据结构/6.查找.md",
+    "考研/数据结构/assets/image-20240411183945391.png",
+    "考研/数据结构/assets/image-20240411171025543.png",
+    "考研/数据结构/assets/10B7C5F2.gif",
+    "考研/数据结构/assets/image-20240411154644508.png",
+    "考研/数据结构/assets/image-20240411153936602.png",
+    "考研/数据结构/assets/image-20240411150354012.png",
+    "other/13.hexo博客搭建.md",
+    "other/14.图床和jsdelivr.md",
+    "other/assets/image-20240411131342772.png",
+    "other/15.typora主题魔改.md",
+    "other/2.typora.md",
+    "other/4.mklink文件搬家.md",
+    "temp/theme.md",
+    "temp/Untitled.md",
+    "考研/数据结构/assets/2024-04-11-11-55-02-f49d6e.gif",
+    "考研/数据结构/assets/2024-04-11-11-55-02-f49d6e-1712807717647-2.gif",
+    "考研/数据结构/assets/image-20240411114842388.png",
+    "考研/数据结构/数据结构.md",
+    "考研/数据结构/1. 线性表.md",
+    "考研/数据结构/c++基础.md",
+    "考研/数据结构/3.串和数组.md",
+    "考研/数据结构/Untitled.md",
+    "考研/数据结构/6.排序.md",
+    "考研/数据结构/5.图.md",
+    "考研/数据结构/4.树.md",
+    "考研/数据结构/2.栈和队列.md",
+    "考研/数据结构/1. (copy).md",
+    "考研/数据结构/1..md",
+    "readme.md",
+    "pic",
+    "新建文件夹",
+    "未命名 1.canvas",
+    "未命名.canvas",
+    "2024-03-25.md",
+    "Excalidraw/Drawing 2024-03-18 11.26.31.excalidraw.md"
+  ]
+}

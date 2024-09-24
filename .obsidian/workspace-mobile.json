@@ -1,0 +1,180 @@
+{
+  "main": {
+    "id": "e434df2aaf86af20",
+    "type": "split",
+    "children": [
+      {
+        "id": "7c406b72d79a57f2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f6427774ceeec454",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "考研/数据结构/数据结构.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "469f7e0ddfb39b1b",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "考研/数据结构/Drawing 2024-03-17 10.38.29.excalidraw.md"
+              }
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "6fdbc3ec78c0a594",
+    "type": "mobile-drawer",
+    "children": [
+      {
+        "id": "ec23ab1d555d87d5",
+        "type": "leaf",
+        "state": {
+          "type": "file-explorer",
+          "state": {
+            "sortOrder": "alphabetical"
+          }
+        }
+      },
+      {
+        "id": "071c1dabe551a23d",
+        "type": "leaf",
+        "state": {
+          "type": "search",
+          "state": {
+            "query": "",
+            "matchingCase": false,
+            "explainSearch": false,
+            "collapseAll": false,
+            "extraContext": false,
+            "sortOrder": "alphabetical"
+          }
+        }
+      },
+      {
+        "id": "de144c6ba417b1d3",
+        "type": "leaf",
+        "state": {
+          "type": "tag",
+          "state": {
+            "sortOrder": "frequency",
+            "useHierarchy": true
+          }
+        }
+      },
+      {
+        "id": "367a225e79964dd1",
+        "type": "leaf",
+        "state": {
+          "type": "bookmarks",
+          "state": {}
+        }
+      },
+      {
+        "id": "8d678ebb99b8c8f1",
+        "type": "leaf",
+        "state": {
+          "type": "file-tree-view",
+          "state": {}
+        }
+      }
+    ],
+    "currentTab": 0
+  },
+  "right": {
+    "id": "f278b238bf8bb6d5",
+    "type": "mobile-drawer",
+    "children": [
+      {
+        "id": "9e67fbde4a65ea9a",
+        "type": "leaf",
+        "state": {
+          "type": "backlink",
+          "state": {
+            "file": "考研/数据结构/Drawing 2024-03-17 10.38.29.excalidraw.md",
+            "collapseAll": false,
+            "extraContext": false,
+            "sortOrder": "alphabetical",
+            "showSearch": false,
+            "searchQuery": "",
+            "backlinkCollapsed": false,
+            "unlinkedCollapsed": true
+          }
+        }
+      },
+      {
+        "id": "d4002dbcba891906",
+        "type": "leaf",
+        "state": {
+          "type": "outgoing-link",
+          "state": {
+            "file": "考研/数据结构/Drawing 2024-03-17 10.38.29.excalidraw.md",
+            "linksCollapsed": false,
+            "unlinkedCollapsed": true
+          }
+        }
+      },
+      {
+        "id": "fe6ffddcb937da73",
+        "type": "leaf",
+        "state": {
+          "type": "outline",
+          "state": {
+            "file": "考研/数据结构/Drawing 2024-03-17 10.38.29.excalidraw.md"
+          }
+        }
+      },
+      {
+        "id": "73bf37c85feb65e3",
+        "type": "leaf",
+        "state": {
+          "type": "calendar",
+          "state": {}
+        }
+      }
+    ],
+    "currentTab": 2
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "file-tree-alternative:File Tree Alternative Plugin": false,
+      "obsidian-excalidraw-plugin:新建绘图文件": false,
+      "markdown-importer:打开 Markdown 格式转换器": false
+    }
+  },
+  "active": "469f7e0ddfb39b1b",
+  "lastOpenFiles": [
+    "考研/数据结构/数据结构.md",
+    "考研/数据结构/Drawing 2024-03-17 10.38.29.excalidraw.md",
+    "readme.md",
+    "obsidian.md",
+    "Drawing 2024-03-17 09.49.01.excalidraw.md",
+    "assets/Capture_20240317_092206.jpg",
+    "assets",
+    "__ImageMagicianPluginBasePathFinder__1",
+    "other/10.termux.md",
+    "考研/数据结构/c++基础.md",
+    "Excalidraw/Drawing 2024-03-17 00.07.16.excalidraw.md",
+    "Excalidraw",
+    "vue/11.vue3.md"
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "version": "0.1.8",
+  "supportedFormats": [
+    "psd",
+    "psb",
+    "xcf",
+    "tif",
+    "tiff",
+    "dcm",
+    "dds",
+    "hdr",
+    "heic",
+    "mng",
+    "pbm",
+    "pcx",
+    "pfm",
+    "pgm",
+    "pnm",
+    "ppm",
+    "sgi",
+    "xbm"
+  ],
+  "exportMenuSupportedFormats": [
+    "psd",
+    "psb",
+    "xcf",
+    "tif",
+    "tiff",
+    "dcm",
+    "dds",
+    "hdr",
+    "heic",
+    "mng",
+    "pbm",
+    "pcx",
+    "pfm",
+    "pgm",
+    "pnm",
+    "ppm",
+    "sgi",
+    "xbm",
+    "avif",
+    "jpg",
+    "png",
+    "bmp",
+    "webp",
+    "gif"
+  ],
+  "autoExportList": [],
+  "instantExport": {
+    "name": "",
+    "active": false,
+    "format": {
+      "display": "PNG",
+      "mimeType": "image/png",
+      "ext": "png"
+    },
+    "imgProps": {
+      "quality": 1,
+      "sizeAdjustments": []
+    },
+    "pathOpts": {
+      "sourceDir": "",
+      "recursiveSources": false,
+      "useBuiltInSourceFilters": true,
+      "builtInSourceFilters": [
+        {
+          "active": true,
+          "type": 4
+        }
+      ],
+      "sourceExts": [],
+      "sourceFilters": [],
+      "folderDeterminer": 0,
+      "exportDirAbs": "Exported Images",
+      "exportDirRel": "",
+      "useCustomFileNameFormat": false,
+      "fileNameFormatPrefix": "",
+      "fileNameFormatSuffix": "export",
+      "customFileNameFormat": "${name}.${ext}.export.${dst_ext}"
+    }
+  },
+  "renderMarkdownInlineLink": true,
+  "renderMarkdownImgTag": true,
+  "overrideDragAndDrop": true,
+  "useBlob": false,
+  "excalidrawStretchEmbed": true,
+  "previewLink": true,
+  "supportMdImageSizeFormat": true,
+  "trackRename": true,
+  "trackDelete": false,
+  "vaultBasedPathSupporter": {
+    "enabled": true,
+    "plainText": true,
+    "inlineLink": true,
+    "filters": [
+      {
+        "el": "img",
+        "attr": "src"
+      }
+    ]
+  }
+}

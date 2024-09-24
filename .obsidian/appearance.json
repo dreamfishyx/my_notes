@@ -1,0 +1,16 @@
+{
+  "accentColor": "",
+  "cssTheme": "AnuPpuccin",
+  "interfaceFontFamily": "Monaco,Microsoft YaHei UI",
+  "textFontFamily": "Monaco,Aa维她柠檬茶",
+  "monospaceFontFamily": "Fira Code,Source Code Pro,Inconsolata",
+  "translucency": false,
+  "enabledCssSnippets": [
+    "extended-colorschemes",
+    "custom-background",
+    "custom-rainbow-colors"
+  ],
+  "theme": "moonstone",
+  "baseFontSizeAction": true,
+  "baseFontSize": 17
+}
