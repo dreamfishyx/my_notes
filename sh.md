@@ -46,9 +46,9 @@ git push
 
 2. 方式二：
 
-   1. 进入本地存放代码的目录删除`.git`隐藏目录
-   2. 执行`git init`命令初始化本地目录为一个git仓库
-   3. 执行`git add -A`命令添加本地代码到仓库
+   1. 进入本地仓库删除`.git`目录。
+   2. `git init`命令初始化本地仓库。
+   3. `git add -A`命令添加本地代码到仓库。
 
-   6. 执行`git commit`命令提交本地代码到仓库
-   7. 执行`git push -f`命令强制提交到远程仓库
+   6. `git commit`提交。
+   7. `git push -f <url> master`强制提交到远程仓库。
