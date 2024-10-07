@@ -1,3 +1,24 @@
+##### ioc图标制作
+
+1. ~~[裁剪](https://www.gaitubao.com/)~~[推荐(直接1:1裁剪)](https://picwish.cn/crop-image)
+2. [在线抠图](https://picwish.cn/remove-background)
+3. [圆角](https://www.butterpig.top/radius)
+4. ~~[创建图标](https://www.logosc.cn/favicon-generator)~~[边距5%圆角450](http://androidasset.studio/icons-launcher.html#foreground.type=image&foreground.space.trim=1&foreground.space.pad=0.05&foreColor=rgba(96%2C%20125%2C%20139%2C%200)&backColor=rgb(96%2C%20125%2C%20139)&crop=0&backgroundShape=none&effects=none&name=ic_launcher)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ##### 您说：
 
 符号链接是软连接吗？和硬链接有啥区别？
