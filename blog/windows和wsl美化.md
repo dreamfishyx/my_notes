@@ -256,7 +256,7 @@
 
 1. 壁纸配置: steam 安装壁纸引擎(Wallpaper Engine,收费)，按照自己的喜好设置壁纸,设置为开机自启。
 2. dock栏： steam 安装 mydockfinder(收费) ，按照自己的喜好设置即可，或者也可以使用免费的[Winstep Nexus](https://www.winstep.net/nexus.asp)。但是我需要通过系统托盘关一些后台软件，所以才用的mydockfinder(很早就接触这个软件，还是不错，目前可能还有些bug。现在电脑有点老，有时候打开几个软件就有点带不动，所以不打算用这个软件) 。<br><img src="https://raw.githubusercontent.com/dreamfishyx/pictures/main/pic/20241007220814.png" style="zoom: 80%;" />
-3. 状态栏透明:[TranslucentTB](https://github.com/TranslucentTB/TranslucentTB)(也可以直接在微软商店下载)，实际上 mybockfinder 占用内存还是有点大(不能接受)，所以还是直接透明化任务栏吧。右键状态栏，选择任务栏设置，然后在里面设置任务栏自动隐藏(下图的律动时钟来自雨滴，与TranslucentTB无关)。<br><img src="https://raw.githubusercontent.com/dreamfishyx/pictures/main/pic/20241008203835.png" style="zoom:80%;" />
+3. 状态栏透明:[TranslucentTB](https://github.com/TranslucentTB/TranslucentTB)(推荐直接在微软商店下载，可以配置开机自启)，实际上 mybockfinder 占用内存还是有点大(不能接受)，所以还是直接透明化任务栏吧。右键状态栏，选择任务栏设置，然后在里面设置任务栏自动隐藏(下图的律动时钟来自雨滴，与TranslucentTB无关)。<br><img src="https://raw.githubusercontent.com/dreamfishyx/pictures/main/pic/20241008203835.png" style="zoom:80%;" />
 4. 桌面组件：官网安装[雨滴插件](https://www.rainmeter.net/)，然后下载安装主题即可(推荐[致美化](https://zhutix.com/tag/rainmeter/))。
 5. 鼠标样式：
    1. [致美化](https://zhutix.com/tag/cursors/)找自己喜欢的鼠标样式下载解压([目前正在使用](https://zhutix.com/ico/breeze-snow-hd-cus/))，右键`.inf`文件安装鼠标样式。
