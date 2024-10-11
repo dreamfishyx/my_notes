@@ -78,6 +78,8 @@
 
 9. powershell的上方标签栏很碍眼，在Terminal设置的操作中设置一个切换专注模式的快捷键，然后在 设置->启动->启动参数->启动模式 设置为专注模式即可。
 
+10. 此外在Terminal的 设置->默认值->外观->背景图片 中设置背景图和透明度等(个人感觉这张图挺好，放这:[here](https://raw.githubusercontent.com/dreamfishyx/pictures/main/pic/202410112302439.jpg))。![](https://raw.githubusercontent.com/dreamfishyx/pictures/main/pic/202410112258614.png)
+
 ---
 
 
@@ -315,7 +317,9 @@
 
 8. 火绒安全: 弹窗拦截。
 
-9. scoop: Windows下的一个包管理器，它与Mac下的brew是一个类似的工具。爽！！！
+9. Navicat Premium Lite: 数据库连接(Navicat Premium的免费版本)。
+
+10. scoop: Windows下的一个包管理器，它与Mac下的brew是一个类似的工具。爽！！！
 
    1. 在管理员下运行powershell,并运行以下安装命令：
 
