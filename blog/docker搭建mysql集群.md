@@ -1,189 +1,20 @@
-#### mysql
+##### 前言
 
-##### mysql容器配置
+1. 搭建环境: wsl( archlinux) + docker。
 
-1. `docker pull mysql` 拉取最新版的 mysql 镜像( 9.0.1 )。
+2. mysql镜像版本: 9.0.1 (高版本配置改动的太多了，好多坑)
 
-2. 参考官方[文档](https://hub.docker.com/_/mysql)启动容器`docker run --name <container_name> -e MYSQL_ROOT_PASSWORD=<password> -d mysql:<tag>`，其中 `-e MYSQL_ROOT_PASSWORD`指定运行时的环境变量 MYSQL_ROOT_PASSWORD ，即 root 用户的密码。当然通过文档也可以知道还可以在创建容器时新增用户，即通过环境变量`-e MYSQL_USER=<user_name> \ -e MYSQL_PASSWORD=<user_password>`。
-
-3. 然后就可以通过`docker exec -it <container_name> /bin/bash`进入容器中，并且使用 `mysql -uroot -p`使用密码登录。
-
-4. 对于 mysql 镜像而言，其中存在以下几个重要位置：
-
-   1. 数据文件位置：`/var/lib/mysql`。
-
-      ```bash
-      bash-5.1# ls -l /var/lib/mysql
-      total 112528
-      -rw-r----- 1 mysql mysql  6291456 Oct 12 10:47 '#ib_16384_0.dblwr'
-      -rw-r----- 1 mysql mysql 14680064 Oct 12 10:45 '#ib_16384_1.dblwr'
-      drwxr-x--- 2 mysql mysql     4096 Oct 12 10:45 '#innodb_redo'
-      drwxr-x--- 2 mysql mysql     4096 Oct 12 10:45 '#innodb_temp'
-      -rw-r----- 1 mysql mysql       56 Oct 12 10:45  auto.cnf
-      -rw-r----- 1 mysql mysql  2943051 Oct 12 10:45  binlog.000001
-      -rw-r----- 1 mysql mysql      158 Oct 12 10:45  binlog.000002
-      -rw-r----- 1 mysql mysql       32 Oct 12 10:45  binlog.index
-      -rw------- 1 mysql mysql     1705 Oct 12 10:45  ca-key.pem
-      -rw-r--r-- 1 mysql mysql     1108 Oct 12 10:45  ca.pem
-      -rw-r--r-- 1 mysql mysql     1108 Oct 12 10:45  client-cert.pem
-      -rw------- 1 mysql mysql     1705 Oct 12 10:45  client-key.pem
-      -rw-r----- 1 mysql mysql     5642 Oct 12 10:45  ib_buffer_pool
-      -rw-r----- 1 mysql mysql 12582912 Oct 12 10:45  ibdata1
-      -rw-r----- 1 mysql mysql 12582912 Oct 12 10:45  ibtmp1
-      drwxr-x--- 2 mysql mysql     4096 Oct 12 10:45  mysql
-      -rw-r----- 1 mysql mysql 32505856 Oct 12 10:45  mysql.ibd
-      lrwxrwxrwx 1 mysql mysql       27 Oct 12 10:45  mysql.sock -> /var/run/mysqld/mysqld.sock
-      -rw-r----- 1 mysql mysql      131 Oct 12 10:45  mysql_upgrade_history
-      drwxr-x--- 2 mysql mysql     4096 Oct 12 10:45  performance_schema
-      -rw------- 1 mysql mysql     1705 Oct 12 10:45  private_key.pem
-      -rw-r--r-- 1 mysql mysql      452 Oct 12 10:45  public_key.pem
-      -rw-r--r-- 1 mysql mysql     1108 Oct 12 10:45  server-cert.pem
-      -rw------- 1 mysql mysql     1705 Oct 12 10:45  server-key.pem
-      drwxr-x--- 2 mysql mysql     4096 Oct 12 10:45  sys
-      -rw-r----- 1 mysql mysql 16777216 Oct 12 10:47  undo_001
-      -rw-r----- 1 mysql mysql 16777216 Oct 12 10:47  undo_002
-      
-      bash-5.1# ls -l /var/lib/mysql/sys
-      total 112
-      -rw-r----- 1 mysql mysql 114688 Oct 12 10:45 sys_config.ibd
-      ```
-
-   2. 日志文件位置：`/var/log/mysql`。
-
-   3. 配置文件位置：`/etc/mysql/`(使用较多的还是 `/etc/mysql/conf.d` 目录)。
-
-5. 实际上，对于上述运行的容器，我们通过 `show variables like 'char%';` 查询，发现其字符编码并不全是我们期望的 utf8 或 utf8mb4 。
-
-   ```bash
-   mysql> show variables like 'char%';
-   +--------------------------+--------------------------------+
-   | Variable_name            | Value                          |
-   +--------------------------+--------------------------------+
-   | character_set_client     | latin1                         |
-   | character_set_connection | latin1                         |
-   | character_set_database   | utf8mb4                        |
-   | character_set_filesystem | binary                         |
-   | character_set_results    | latin1                         |
-   | character_set_server     | utf8mb4                        |
-   | character_set_system     | utf8mb3                        |
-   | character_sets_dir       | /usr/share/mysql-9.0/charsets/ |
-   +--------------------------+--------------------------------+
-   8 rows in set (0.04 sec)
-   ```
-
-6. 此外，如果容器被不小心删除了，那么无论是数据文件、日志文件，还是设置字符编码的 my.cnf 文件，都将消失。在生产中，这是绝对不允许的，所以要保证数据的安全性。
-
-> 关于 utf8 和 utf8mb4 :
->
-> 1. utf8 和 utf8mb4 是两种字符集编码方式，它们之间的区别在于能够存储的字符范围和最大字节长度。
-> 2.  utf8 是 MySQL 中最常用的字符集编码方式，它使用1到3个字节来存储字符。 utf8 能够存储大部分的中文汉字，但对于一些特殊的字符，如表情符号、一些较新的 Unicode 字符等， utf8 无法存储。
-> 3. 而 utf8mb4 是 utf8 的超集，它使用1到4个字节来存储字符。 utf8mb4 可以存储任何 Unicode 字符，包括表情符号和一些较新的字符。因此，当需要存储这些特殊字符时，需要使用 utf8mb4 编码。
-> 4. 在 MySQL 8.0 及更高版本中，utf8mb4 已成为默认字符集。对于新项目，特别是需要存储表情符号或其他特殊字符的项目，应该使用 utf8mb4 编码。需要注意的是，使用 utf8mb4 编码会占用更多的存储空间，因为它使用的字节长度更长。因此，在选择字符集编码时，需要根据实际需求和存储空间的考虑来决定使用 utf8 还是 utf8mb4 。
-
-
-
-
-
-##### 补充
-
-1. `general_log` (通用查询日志)是 MySQL 中的一种日志类型，用于记录所有发送到 MySQL 服务器的SQL查询(不论是否执行成功)。它可以帮助你调试和监控系统，跟踪数据库收到的每一个请求。在开发中可能用得上，记录一下。
-
-2. 查看是否开启和开启：
-
-   ```bash
-   mysql> SHOW VARIABLES LIKE "general_log%";
-   +------------------+---------------------------------+
-   | Variable_name    | Value                           |
-   +------------------+---------------------------------+
-   | general_log      | OFF                             |
-   | general_log_file | /var/lib/mysql/07bf4b52e83a.log |
-   +------------------+---------------------------------+
-   2 rows in set (0.01 sec)
-   
-   mysql> set global general_log=on;
-   Query OK, 0 rows affected (0.02 sec)
-   
-   mysql> show variables like 'general_log%';
-   +------------------+---------------------------------+
-   | Variable_name    | Value                           |
-   +------------------+---------------------------------+
-   | general_log      | ON                              |
-   | general_log_file | /var/lib/mysql/07bf4b52e83a.log |
-   +------------------+---------------------------------+
-   2 rows in set (0.01 sec)
-   ```
-
-   ```bash
-   mysql> create database test;
-   mysql> use test;
-   mysql> create table  user(id int, name varchar(20), age int);
-   mysql> insert into user values(1,'dreamfish',20);
-   ```
-
-   
-
-
-
-##### 生产环境配置
-
-1. 为了保证数据的安全性，在生产环境下安装的 mysql 容器，在启动时都会使用数据卷来持久化数据:
-
-   ```bash
-   docker run --name mysql_c \
-   -e MYSQL_ROOT_PASSWORD=<password> \
-   -v ~/mysql/data:/var/lib/mysql \
-   -v ~/mysql/log:/var/log/mysql \
-   -v ~/mysql/conf:/etc/mysql/conf.d \
-   -dp 3306:3306 \
-   mysql:<tag>
-   ```
-
-2. 解决字符编码的问题(尤其是 mysql5.x )，在宿主机的 `~/mysql/conf` 目录(这是配置文件对应的数据卷目录)中新建 my.cnf 文件，并在其中键入如下内容(当然其实也可以后面在容器中创建)：
-
-   ```toml
-   [client]
-   default_character_set=utf8mb4
-   
-   [mysql]
-   default_character_set=utf8mb4
-   
-   [mysqld]
-   character_set_server=utf8mb4
-   ```
-
-3.  `docker restart mysql_c `重启容器并 `docker exec -it mysql /bin/bash` 进入容器，查看是否生效：
-
-   ```bash
-   mysql> show variables like 'character%';
-   +--------------------------+--------------------------------+
-   | Variable_name            | Value                          |
-   +--------------------------+--------------------------------+
-   | character_set_client     | utf8mb4                        |
-   | character_set_connection | utf8mb4                        |
-   | character_set_database   | utf8mb4                        |
-   | character_set_filesystem | binary                         |
-   | character_set_results    | utf8mb4                        |
-   | character_set_server     | utf8mb4                        |
-   | character_set_system     | utf8mb3                        |
-   | character_sets_dir       | /usr/share/mysql-9.0/charsets/ |
-   +--------------------------+--------------------------------+
-   8 rows in set (0.01 sec)
-   ```
-
-   
-
-   
-
+    
 
 ##### 搭建mysql集群
 
-1. <font color=red>由于mysql版本差异性，所以可能存在配置文件错误导致容器无法运行，使用`docker logs <container_name>` 查看。</font>
+1. 单机版的 MySQL 存在单点问题，且在高并发场景下性能会急剧下降。所以，生产中对于 MySQL 都是使用读写分离的主从集群。既保证了数据的安全性，又提升了性能。下面要使用 Docker 搭建一个“一主一从”的 MySQL 读写分离集群。
 
-2. 单机版的 MySQL 存在单点问题，且在高并发场景下性能会急剧下降。所以，生产中对于 MySQL 都是使用读写分离的主从集群。既保证了数据的安全性，又提升了性能。下面要使用 Docker 搭建一个“一主一从”的 MySQL 读写分离集群。
+2. <font color=red>由于mysql版本差异性，所以可能存在配置文件错误导致容器无法运行，可以使用`docker logs <container_name>` 查看错误信息。</font>
 
 3. 首先我们需要创建一个 Docker 网络，使 MySQL 主库和从库能够在同一个网络中通信:`docker network create mysql-cluster-net`。
 
-   > chatgpt推荐创建 Docker 网络(其实感觉基本上可以通过`--link`参数配置定向连接解决)：
+   > chatgpt推荐创建 Docker 网络(使用默认 bridge 可以通过`--link`参数配置定向连接解决)：
    >
    > 1. **容器间通信便捷**： 当容器在同一个 Docker 网络中时，它们可以通过容器名称相互通信。例如，`mysql-slave` 可以通过容器名 `mysql-master` 来访问主库，而不需要通过 IP 地址。这极大地简化了配置。
    > 2. **避免使用动态 IP**： Docker 分配给容器的 IP 地址可能会变化。使用容器名称而不是硬编码的 IP 地址可以确保容器即使重新启动后也能保持连接，避免 IP 地址的管理问题。
@@ -337,8 +168,6 @@
     -- 关闭同步
     STOP REPLICA;
     ```
-
-    <br><img src="./assets/0B0CD584.png" alt="0B0CD584" style="zoom:67%;" />
 
 14. 查看从库的状态，以确保配置成功：`SHOW SLAVE STATUS \G;`(8.0.22之后请使用`SHOW REPLICA STATUS \G;`，[官方说明](https://dev.mysql.com/doc/refman/8.0/en/show-slave-status.html)),确保 `Slave_IO_Running` 和 `Slave_SQL_Running` 均为 `Yes`。
 
@@ -563,7 +392,7 @@
       64 bytes from 172.19.0.2: icmp_seq=3 ttl=64 time=0.051 ms
       ```
 
-6. 此时大致可以猜测为端口号的原因，于是乎脑子一抽，我认为是 window 的 3316 端口被占用(但是实际上这和 windows 没有半毛钱关系，这里是在wsl内部，不会经过windows)。没有端口被占用。
+6. 此时大致可以猜测为端口号的原因，于是乎脑子一抽，我认为是 window 的 3316 端口被占用(但是实际上这和 windows 没有半毛钱关系，这里是在wsl内部，不会经过windows),没有端口被占用。
 
    ```bash
    yxlum@Dream-sea ~  netstat -aon|findstr "3316"
@@ -573,7 +402,7 @@
 
 7. 这时，退而求其次，怀疑是 wsl 的 archlinux 的端口被占用 ` netstat -tunlp | grep 3316`。确实占用了，但是是 mysql 容器占用的。
 
-8. 然后就是百思不得其解，只到某次在从库中连接主库的时候，尝试把端口号由3316改成3306,然后就成了。
+8. 到这里基本上就要崩溃了，后面就是无止境的删除并重新搭建，然后尝试换成默认的 bridge 网络，都没有作用。直到某次在从库中连接主库的时候，尝试把端口号由3316改成3306,然后就成功了。
 
 9. 实际上，上述的错误本质上还是对docker、wsl(archlinux)、windows三种之间的网络和端口映射没有捋清楚。docker中的每个容器都运行在自己独立的网络命名空间，。容器之间的通信通过 Docker 网络进行，此时相当于是不经过主机( archlinux )。我们在从库中通过 ip 访问主库，是否可以视作主库和从库是在局域网中的两台主机，二者通过网桥交流，此时访问 主库中的数据库，端口仍然为 3306 。而其端口映射，则是通过主机( archlinux ) 访问 3316 时，经过 docker 内部的处理逻辑，将访问转发到对应容器的 3306 端口。(但是其实这里还有一个疑问没有解决:对于一个docker中运行的mysql容器(3316->3306)，我在 wsl 中发现3316被监听占用，但是在windows中并未对 3316 端口监听）
 
@@ -629,11 +458,11 @@
    ❯ docker exec -it mysql-slave mysql -u slave -h 172.19.0.2 -P 3306 -p  --get-server-public-key
    ```
 
-   
 
 
 
-##### 说明(gpt总结，待验证)
+
+##### 参数说明(gpt总结，待验证)
 
 1. 主库配置文件常用配置：
 
@@ -729,31 +558,9 @@
       - `replicate-ignore-db=test_db`：忽略 `test_db` 数据库的内容，不将其复制到从库。
    9. `relay_log_purge`：设置是否自动清除过期的中继日志。启用此选项（`1`）时，MySQL 会自动删除已经应用过的中继日志文件。这样可以节省磁盘空间。
 
-5. 关于只读从库：`read_only=1`可以将从库设置为只读，防止直接修改数据库中的数据。但是改配置对于具有超级用户权限的账户是无效的；并且一般也不建议使用`super_read_only=1`。此外，也可以直接在从库中查看和设置:
-
-   ```bash
-   mysql> select @@super_only, @@read_only;
-   ERROR 1193 (HY000): Unknown system variable 'super_only'
-   mysql> select @@super_read_only, @@read_only;
-   +-------------------+-------------+
-   | @@super_read_only | @@read_only |
-   +-------------------+-------------+
-   |                 0 |           1 |
-   +-------------------+-------------+
-   1 row in set (0.00 sec)
-   
-   mysql> set global super_read_only=1;
-   Query OK, 0 rows affected (0.00 sec)
-   ```
-
-   
+5. 关于只读从库：`read_only=1`可以将从库设置为只读，防止直接修改数据库中的数据。但是改配置对于具有超级用户权限的账户是无效的；并且一般也不建议使用`super_read_only=1`。
 
 
 
----
 
 
-
-#### redis
-
-学完redis7再补充(109集)
