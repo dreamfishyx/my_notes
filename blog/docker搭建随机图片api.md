@@ -4,7 +4,7 @@
 
 1. 在搭建个人博客时，希望文章封面可以不用每次手动设计，而是随机获取。而恰好butterfly主题提供了对应设置，于是就想自己部署一个自己的api。
 2. 将想法提供个chatgpt，它提出采用flask框架搭建。为了防止被其他人直接访问，又配置了api key的验证方式(虽然很简陋)。由于最近在学习docker，且本博客也是采用1panel面板搭建，于是将api配置成dockerfile，从而实现在docker中部署。
-3. 项目地址：[random_image_api](https://github.com/dreamfishyx/random_image_api)（目前，发现一些不合理的地方，不应该每次访问都扫描获取图片列表，实际上只需要在修改图片名称等操作后更新图片列表。此外，docker的一些细节上，也有带改进，例如使用数据卷实现添加图片，后续学完docker知识后有时间会更正。）
+3. 项目地址：[random_image_api](https://github.com/dreamfishyx/random_image_api)~~（目前，发现一些不合理的地方，不应该每次访问都扫描获取图片列表，实际上只需要在修改图片名称等操作后更新图片列表。此外，docker的一些细节上，也有带改进，例如使用数据卷实现添加图片，后续学完docker知识后有时间会更正。）~~
 
 
 
@@ -13,126 +13,173 @@
 ##### 项目结构
 
 ```markdown
-/image-api
-|-- Dockerfile (docker镜像构建文件)
-|-- app.py (服务)
-|-- api_key.txt (初始key)
-|-- convert_images.sh (将/images图片转为webp格式,非图片删除,可能会误删,建议图片格式png、jpg、webp)
-|-- update_api_key.sh (生成或更新key)
-|-- /images (存放用于随机读取的图片)
+./image-api
+├── app
+│   ├── api_key.txt(初始api_key)
+│   ├── app.py(服务)
+│   ├── convert_images.sh(将/images图片转为webp格式,非图片删除,可能会误删,建议图片格式png、jpg、webp)
+│   └── update_api_key.sh(生成或更新key)
+├── Dockerfile(docker镜像构建文件)
+└── README.md
 ```
 
 
 
 
 
-##### 使用
+##### 构建
 
-1. 使用前提：正确安装`docker`,并可以正常拉取镜像。
+项目文档中有详细的使用步骤，请参考项目文档构建使用...
 
-2. 克隆仓库：(图片内存有点的,可能有些慢,可以尝试直接复制文件内容)
 
-   ```bash
-   git clone https://github.com/dreamfishyx/random_image_api.git
-   
-   cd ./random_image_api
-   ```
-
-3. 在`images`中准备好你所需要的图片文件(非图片格式在构建镜像时会被删除)。`images`中内置一些我自己收藏的壁纸(图片来源于网络,不可商用),不喜欢的可以自行筛选删除,但请确保构建镜像前`images`文件夹不为空。
-
-4. 构建并启动镜像后重置key(镜像名、容器名可自定义)：
-
-   ```bash
-   # 构建镜像
-   docker build -t random-image-api .
-   
-   # 运行容器
-   docker run -dp 5000:5000 --name api random-image-api
-   
-   # 更新key
-   docker exec -it api /app/update_api_key.sh
-   ```
-
-5. 初始key在`api_key.txt`中,但是不建议使用。请按照上述命令更新key,更新后原来的key失效(含初始key)。
-
-6. 通过访问`http://localhost:5000/random-image/xxxxxx you key xxxxxx`来测试`API`，它会随机返回一张图片。
 
 
 
 ##### app.py介绍
 
-```python
-from flask import Flask, request, jsonify, send_file
-from functools import wraps
-from flask_cors import CORS  # 导入 CORS
-import os
-import secrets
-import random
+1. 使用 Python 的 Flask 框架来快速构建一个简单的`API`服务: 这里相较于最初版本，添加更新图片的功能。在最初版本，在每一次请求时都需要获取一次图片列表和 api 秘钥，显然这样是十分低效的。实际上对于图片列表和 api 秘钥，大部分时间都是处于不变状态，因此只需要在更新的时候动态维护即可。
 
-app = Flask(__name__)
-CORS(app) 
-"""
-启用跨域支持，默认允许所有来源
-如果想限制允许访问的域名，在CORS中传入特定参数，如:
-CORS(app, origins=['https://example.com'])
-"""
+2. 此外靠虑了很久，我仍然不认可由 url 控制 api 秘钥和图片列表的更新，这并不安全，即使这样可以简化操作。故而 url 只负责对数据的更新维护，不具有脚本执行的权利，更新脚本仍然需要用户手动执行。
 
-# API密钥存储文件路径
-API_KEY_FILE = '/app/api_key.txt'
+3. 实际上在最初的时候，我并不太看好 url 控制更新。我采用的是 flask cli，这期间也出现一些问题，在此记录一下:
 
-# 从文件中读取API密钥
-def read_api_key():
-    if os.path.exists(API_KEY_FILE):
-        with open(API_KEY_FILE, 'r') as f:
-            return f.read().strip()
-    return None
+   1. 使用 flask run 启动应用时，Flask 会自己管理应用的启动，而不会执行 app.py 的 `if __name__ == '__main__':` 中的初始化代码。这是因为 `flask run` 会启动 Flask 服务器，而不是通过 `python app.py` 或其他方式直接启动应用。
+   1. 使用 flask cli 需要使用 `CMD ["flask run --host=0.0.0.0"]` 启动(并配置启动环境 `ENV FLASK_APP=app.py` )，但是官方不建议在生产环境中使用 flask 内置服务器(即使用 flask run 启动服务)。
 
-# 验证请求中提供的API密钥
-def verify_api_key(token):
-    stored_key = read_api_key()
-    return stored_key and secrets.compare_digest(stored_key, token)
+4. 后来我又采用 `CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "--timeout", "37", "app:app"]` 启动(2.0版本)，不知是否是参数设置的问题，响应速度特别慢，最终还是改回 `CMD ["python","app.py"]` (3.0版本)。
 
-# 装饰器：验证API密钥
-def require_api_key(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        # 从路径参数中获取API密钥
-        token = kwargs.get('key')
-        if not token or not verify_api_key(token):
-            return jsonify({"error": "Unauthorized"}), 401
-        return f(*args, **kwargs)
-    return decorated_function
+5. 具体代码及其部分注释如下：
 
-# 提供随机图片的API，要求提供API密钥作为路径参数
-@app.route('/random-image/<key>', methods=['GET'])
-@require_api_key
-def random_image(key):
-    # 确保图片目录存在
-    image_dir = '/app/images'
-    if not os.path.exists(image_dir):
-        return jsonify({"error": "Image directory not found"}), 404
-    
-    # 获取目录下所有的图片文件
-    images = [f for f in os.listdir(image_dir) if f.endswith('.webp')]
-    if not images:
-        return jsonify({"error": "No images found"}), 404
-    
-    # 随机选择一张图片
-    selected_image = os.path.join(image_dir, random.choice(images))
-    
-    # 发送图片文件作为响应
-    return send_file(selected_image, mimetype='image/webp')
+   ```python
+   from flask import Flask, request, jsonify, send_file
+   from functools import wraps
+   from flask_cors import CORS
+   import os
+   import secrets
+   import random
+   # import subprocess
+   import logging
+   from logging.handlers import RotatingFileHandler
+   
+   app = Flask(__name__)
+   CORS(app)
+   """
+   启用跨域支持，默认允许所有来源
+   如果想限制允许访问的域名，在CORS中传入特定参数，如:
+   CORS(app, origins=['https://example.com'])
+   """
+   
+   # api秘钥文件
+   API_KEY_FILE = '/app/api_key.txt'
+   # 图片目录
+   IMAGE_DIR = '/app/images'
+   # API密钥
+   app.config['API_KEY'] = None
+   # 维护图片列表
+   app.config['IMAGE_LIST'] = []
+   
+   # 检查文件是否存在
+   def check_file_exists(path):
+       if not os.path.exists(path):
+           logging.error(f'{path} not found. Exiting...')
+           return False
+       return True
+   
+   # 装饰器：验证API密钥
+   def require_api_key(f):
+       @wraps(f)
+       def decorated_function(*args, **kwargs):
+            # 从url参数中获取API密钥
+           token = kwargs.get('key')
+           # 若从请求头中获取API密钥:request.args.get('key')
+           if not token or not verify_api_key(token):
+               return jsonify({"error": "Unauthorized"}), 401
+           return f(*args, **kwargs)
+       return decorated_function
+   
+       
+   # 更新API密钥(docker exec -it <container_name> update_api_key.sh)
+   @app.route('/update-key/<key>', methods=['GET'])
+   @require_api_key
+   def update_api_key(key):
+       # 维护API密钥
+       app.config['API_KEY'] = read_api_key()
+       if not app.config['API_KEY']:
+           return jsonify({"error": "API key not found or invalid"}), 404
+       return jsonify({"message": "API key updated successfully"}), 200
+   
+   # 从文件中读取API密钥
+   def read_api_key():
+       if os.path.exists(API_KEY_FILE):
+           with open(API_KEY_FILE, 'r') as f:
+               key = f.read().strip()
+               if key:
+                   return key
+       logging.error(f'API key file {API_KEY_FILE} not found or empty.Try run "update-api-key" command.')
+       return None
+   
+   # 验证请求中提供的API密钥
+   def verify_api_key(token):
+       stored_key = app.config['API_KEY']  
+       return stored_key and secrets.compare_digest(stored_key, token)
+   
+   
+   # 解析图片列表
+   def parse_image_list():
+       # 检查目录是否存在，不存在则创建
+       if not os.path.exists(IMAGE_DIR):
+           os.makedirs(IMAGE_DIR)
+       app.config['IMAGE_LIST'] = [f for f in os.listdir(IMAGE_DIR) if f.endswith('.webp')]
+       logging.info(f"Initialized with {len(app.config['IMAGE_LIST'])} images.")
+   
+   
+   # 更新并转换图片(docker exec -it <container_name> convert_images.sh)
+   @app.route('/update-images/<key>', methods=['GET'])
+   @require_api_key
+   def update_images(key):
+       # 维护图片列表
+       parse_image_list()
+       # 判断维护结果并做出回应
+       if not app.config['IMAGE_LIST']:
+           return jsonify({"error": "No images found"}), 404
+       return jsonify({"message": "Images list updated"}), 200
+   
+   
+   # 随机获取一张图片
+   @app.route('/random-image/<key>', methods=['GET'])
+   @require_api_key
+   def random_image(key):
+       if not app.config['IMAGE_LIST']:
+           return jsonify({"error": "No images found"}), 404
+       selected_image = random.choice(app.config['IMAGE_LIST'])
+       return send_file(os.path.join(IMAGE_DIR, selected_image), mimetype='image/webp')
+   
+   
+   if __name__ == '__main__':
+       # 初始化日志
+       handler = RotatingFileHandler('/app/log/app.log', maxBytes=10*1024*1024, backupCount=10)
+       handler.setLevel(logging.INFO)  # 设置信息级别
+       formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+       handler.setFormatter(formatter)
+       logging.getLogger().addHandler(handler)
+       logging.getLogger().addHandler(logging.StreamHandler()) # 确保标准输出也记录日志
+       logging.getLogger().setLevel(logging.INFO)
+   
+       # 初始化图片列表
+       parse_image_list()
+   
+       # 初始化API密钥
+       app.config['API_KEY'] = read_api_key()
+       logging.info(f"API key init:{app.config['API_KEY']}")
+       if not app.config['API_KEY']:
+           logging.error("API key not found or invalid. Exiting.")
+           exit(1)
+           
+       # 运行Flask应用0.0.0.0:5000
+       app.run(host='0.0.0.0', port=5000)
+   ```
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
-    """
-    app.run(): 启动 Flask 的内置开发服务器。
-	host='0.0.0.0': 将应用绑定到所有可用的网络接口，使得外部设备也能访问该服务。
-	port=5000: 将服务器绑定到5000端口，使服务在该端口上监听HTTP请求。
-    """
-```
-
-
+   > gpt建议，在启动时判断一些文件或者目录是否存在并处理，后续可以不再判断。未采用，不排除容器运行过程中失手删除某些文件的可能。但在此记录一下，可以作为以后其他项目优化的一个思路。
 
 
 
@@ -141,28 +188,30 @@ if __name__ == '__main__':
 ```bash
 #!/bin/bash
 
-# 进入图片目录
 cd /app/images || exit
 
 for file in *; do
-  # 如果文件是webp格式，直接跳过
+  # 跳过已经是 WEBP 格式的文件
   if [[ "$file" == *.webp ]]; then
     echo "$file is already in WEBP format. Skipping..."
     continue
   fi
 
-  # 检查文件是否为图片类型
-  if file "$file" | grep -qE 'image|bitmap'; then
-  	# 修复sRGB配置文件问题
-    mogrify -strip "$file"
+  # 检查文件是否为常见图片格式（jpg, png, gif等）
+   if file "$file" | grep -qE 'image|bitmap'; then
+    # 转换图片为 WEBP 格式
     echo "Converting $file to WEBP format..."
-    # 其他图片格式转换为WEBP
     cwebp -quiet "$file" -o "${file%.*}.webp"
-    # 删除原始文件
-    rm "$file"
+
+    # 检查转换是否成功
+    if [[ -f "${file%.*}.webp" ]]; then
+      echo "$file successfully converted. Deleting original..."
+      rm "$file"
+    else
+      echo "Failed to convert $file. Skipping deletion."
+    fi
   else
-  	# 删除非图片文件
-    echo "$file is not an image. Deleting..."
+    echo "$file is not a supported image format. Deleting..."
     rm "$file"
   fi
 done
@@ -199,43 +248,52 @@ echo -e "\033[1;32m========================================\033[0m\n"
 
 ##### **Dockerfile**
 
-```dockerfile
-# 使用python基础镜像
-FROM python:3.11-slim
+1. 接下来,需要创建一个`Dockerfile`来定义Docker镜像的构建过程。但是在此过程中，还是遇到了一些问题：
 
-# 换源并安装必要的软件包和工具(apt-utils略)
-RUN echo "deb http://mirrors.aliyun.com/debian/ bookworm main non-free contrib" > /etc/apt/sources.list \
-    && echo "deb-src http://mirrors.aliyun.com/debian/ bookworm main non-free contrib" >> /etc/apt/sources.list \
-    && echo "deb http://mirrors.aliyun.com/debian-security bookworm-security main" >> /etc/apt/sources.list \
-    && echo "deb-src http://mirrors.aliyun.com/debian-security bookworm-security main" >> /etc/apt/sources.list \
-    && echo "deb http://mirrors.aliyun.com/debian/ bookworm-updates main" >> /etc/apt/sources.list \
-    && echo "deb-src http://mirrors.aliyun.com/debian/ bookworm-updates main" >> /etc/apt/sources.list \
-    && pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ \
-    && apt-get update \
-    && apt-get install -y \
-       imagemagick \
-       libwebp-dev \
-       openssl \
-       file \
-       webp \
-    && pip install --upgrade pip \
-    && pip install Flask \
-  	&& pip install flask-cors \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+   1. 开始时我打算在容器构建时将图片加入到容器并进行格式转换，但是这样会导致容器构建及其缓慢，并且最重要的是后续将系统目录挂载到该位置时，容器的图片文件夹文件夹会被覆盖，功亏一篑。
+   2. 于是我又打算不使用系统目录挂载，而是使用数据卷，虽然通过命令很容易知道数据卷位置，但是后续实际操作发现没有权限，根本进不去。
+   3. 于是只能退而求其次，先启动容器挂载系统目录，然后再添加图片和装换格式。
 
-# 设置工作目录并复制文件
-WORKDIR /app
-COPY . /app
+2. Dockerfile 文件及其部分注释内容如下:
 
-# 使脚本可执行并执行
-RUN chmod +x /app/convert_images.sh /app/update_api_key.sh \
-    && /app/convert_images.sh 
-    
-    
-# 暴露应用运行的端口
-EXPOSE 5000
+   ```dockerfile
+   # 使用python基础镜像
+   FROM python:3.11-slim
+   
+   # 换源并安装必要的软件包和工具(apt-utils略)
+   RUN echo "deb http://mirrors.aliyun.com/debian/ bookworm main non-free contrib" > /etc/apt/sources.list \
+       && echo "deb-src http://mirrors.aliyun.com/debian/ bookworm main non-free contrib" >> /etc/apt/sources.list \
+       && echo "deb http://mirrors.aliyun.com/debian-security bookworm-security main" >> /etc/apt/sources.list \
+       && echo "deb-src http://mirrors.aliyun.com/debian-security bookworm-security main" >> /etc/apt/sources.list \
+       && echo "deb http://mirrors.aliyun.com/debian/ bookworm-updates main" >> /etc/apt/sources.list \
+       && echo "deb-src http://mirrors.aliyun.com/debian/ bookworm-updates main" >> /etc/apt/sources.list \
+       && pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ \
+       && apt-get update \
+       && apt-get install -y \
+          imagemagick \   # 图片修复时使用
+          libwebp-dev \
+          openssl \
+          file \
+          webp \
+       && pip install --upgrade pip \
+       && pip install Flask \
+     	&& pip install flask-cors \
+     	&& pip install gunicorn \
+       && apt-get clean \
+       && rm -rf /var/lib/apt/lists/*
+   
+   # 设置工作目录并复制文件
+   WORKDIR /app
+   COPY ./app /app
+   
+   # 使脚本可执行并执行
+   RUN chmod +x /app/convert_images.sh /app/update_api_key.sh 
+   
+   # 暴露应用运行的端口
+   EXPOSE 5000
+   
+   # 指定运行应用的命令
+   CMD ["python","app.py"]
+   ```
 
-# 指定运行应用的命令
-CMD ["python", "app.py"]
-```
+   > gpt 建议将 /app/convert_images.sh  执行过程放到 CMD 中，即容器执行过程中，以简化容器构建构成。但我觉得会导致容器启动及其缓慢，未采用。但在此记录一下，可以作为以后其他项目优化的一个思路。

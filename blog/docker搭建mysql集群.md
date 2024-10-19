@@ -50,12 +50,11 @@
    log-bin=master-log-bin
    binlog_cache_size=1M
    binlog_format=mixed
-   #expire_logs_days=7(mysql8.x不在支持) 
-   binlog_expire_logs_seconds=604800
+   binlog_expire_logs_seconds=604800 #expire_logs_days=7 (mysql8.x不在支持) 
    slave_skip_errors=1062
    #binlog-do-db=mydb  
    ```
-
+   
 6. 由于修改了 mysql 配置，所以需要重启 master 容器，以使新配置生效：`docker restart mysql-master `。
 
 7. 接着，启动 MySQL 从库容器，并配置好从库的相关参数。
@@ -86,8 +85,7 @@
    log-bin=slave-log-bin
    binlog_cache_size=1M
    binlog_format=mixed
-   #expire_logs_days=7 (mysql8.x不在支持) 
-   binlog_expire_logs_seconds=604800
+   binlog_expire_logs_seconds=604800 #expire_logs_days=7 (mysql8.x不在支持) 
    slave_skip_errors=1062
    
    relay_log=relay-log-bin
@@ -95,7 +93,7 @@
    read_only=1   # 确保从库是只读的
    # super_read_only=1
    ```
-
+   
 9. 完成配置后，重启从库容器：`docker restart mysql-slave`
 
 10. 在主库( mysql-master )上创建复制用户:进入主库容器，创建用于主从复制的用户并赋予它权限。
@@ -153,7 +151,7 @@
     ```bash
     # mysql8.0.23之前
     CHANGE MASTER TO MASTER_HOST='mysql-master', MASTER_USER='slave', MASTER_PASSWORD='slave_password', MASTER_PORT=3306, MASTER_LOG_FILE='master-log-bin.000001', MASTER_LOG_POS=879, MASTER_CONNECT_RETY=30, MASTER_RETRY_COUNT=3;									
-    -- 开启同步(# mysql8.0.22之前)
+    -- 开启同步(mysql8.0.22之前)
     START SLAVE;
     -- 关闭同步
     STOP SLAVE;
@@ -163,7 +161,7 @@
     # mysql8.0.23之后
     CHANGE REPLICATION SOURCE TO SOURCE_HOST='mysql-master>', SOURCE_USER='slave', SOURCE_PASSWORD='<slave_password>', SOURCE_PORT=3306, SOURCE_LOG_FILE='master-log-bin.000001', SOURCE_LOG_POS=879, SOURCE_CONNECT_RETRY=30, SOURCE_RETRY_COUNT=3;
       
-    -- 开启同步(# mysql8.0.22之后)
+    -- 开启同步(mysql8.0.22之后)
     START REPLICA;
     -- 关闭同步
     STOP REPLICA;
@@ -404,7 +402,7 @@
 
 8. 到这里基本上就要崩溃了，后面就是无止境的删除并重新搭建，然后尝试换成默认的 bridge 网络，都没有作用。直到某次在从库中连接主库的时候，尝试把端口号由3316改成3306,然后就成功了。
 
-9. 实际上，上述的错误本质上还是对docker、wsl(archlinux)、windows三种之间的网络和端口映射没有捋清楚。docker中的每个容器都运行在自己独立的网络命名空间，。容器之间的通信通过 Docker 网络进行，此时相当于是不经过主机( archlinux )。我们在从库中通过 ip 访问主库，是否可以视作主库和从库是在局域网中的两台主机，二者通过网桥交流，此时访问 主库中的数据库，端口仍然为 3306 。而其端口映射，则是通过主机( archlinux ) 访问 3316 时，经过 docker 内部的处理逻辑，将访问转发到对应容器的 3306 端口。(但是其实这里还有一个疑问没有解决:对于一个docker中运行的mysql容器(3316->3306)，我在 wsl 中发现3316被监听占用，但是在windows中并未对 3316 端口监听）
+9. 实际上，上述的错误本质上还是对docker、wsl(archlinux)、windows三种之间的网络和端口映射没有捋清楚。docker中的每个容器都运行在自己独立的网络命名空间。容器之间的通信通过 Docker 网络进行，此时相当于是不经过主机( archlinux )。我们在从库中通过 ip 访问主库，是否可以视作主库和从库是在局域网中的两台主机，二者通过网桥交流，此时访问 主库中的数据库，端口仍然为 3306 。而其端口映射，则是通过主机( archlinux ) 访问 3316 时，经过 docker 内部的处理逻辑，将访问转发到对应容器的 3306 端口。(但是其实这里还有一个疑问没有解决:对于一个docker中运行的mysql容器(3316->3306)，我在 wsl 中发现3316被监听占用，但是在windows中并未对 3316 端口监听）
 
 
 
@@ -433,7 +431,7 @@
       docker restart mysql-slave
       ```
 
-2. `ERROR 3021 (HY000): This operation cannot be performed with a running replica io thread; run STOP REPLICA IO_THREAD FOR CHANNEL '' first.`解决措施：
+2. `ERROR 3021 (HY000): This operation cannot be performed with a running replica io thread;`解决措施：
 
    ```bash
    # mysql8.0.22之前
@@ -449,10 +447,10 @@
 
    ```bash
    SET GLOBAL sql_slave_skip_counter = 1;
-   START SLAVE; #START REPLICA;
+   START REPLICA; # START SLAVE;
    ```
 
-4. `Message: Authentication plugin 'caching_sha2_password' reported error: Authentication requires secure connection.`这个错误表明在尝试连接到主服务器时，使用的身份验证插件 caching_sha2_password 要求建立一个安全连接（SSL/TLS），但当前的连接未启用安全连接。解决措施：在主库mysql中运行`ALTER USER 'slave'@'%' IDENTIFIED WITH mysql_native_password BY '<your_password>';`，使主服务器的 `slave` 用户使用 `mysql_native_password` 插件，这个插件不要求 SSL 连接。但是实际上还是会报错显示 `mysql_native_password` 插件未加载，最终解决措施:[参考文章](https://www.cnblogs.com/zgrey/p/15398633.html)
+4. `Message: Authentication plugin 'caching_sha2_password' reported error: Authentication requires secure connection.`这个错误表明在尝试连接到主服务器时，使用的身份验证插件 caching_sha2_password 要求建立一个安全连接（SSL/TLS），但当前的连接未启用安全连接。尝试在主库mysql中运行`ALTER USER 'slave'@'%' IDENTIFIED WITH mysql_native_password BY '<your_password>';`，使主服务器的 `slave` 用户使用 `mysql_native_password` 插件，这个插件不要求 SSL 连接。但是实际上还是会报错显示 `mysql_native_password` 插件未加载，最终解决措施:[参考文章](https://www.cnblogs.com/zgrey/p/15398633.html)
 
    ```bash
    ❯ docker exec -it mysql-slave mysql -u slave -h 172.19.0.2 -P 3306 -p  --get-server-public-key
@@ -558,7 +556,7 @@
       - `replicate-ignore-db=test_db`：忽略 `test_db` 数据库的内容，不将其复制到从库。
    9. `relay_log_purge`：设置是否自动清除过期的中继日志。启用此选项（`1`）时，MySQL 会自动删除已经应用过的中继日志文件。这样可以节省磁盘空间。
 
-5. 关于只读从库：`read_only=1`可以将从库设置为只读，防止直接修改数据库中的数据。但是改配置对于具有超级用户权限的账户是无效的；并且一般也不建议使用`super_read_only=1`。
+5. 关于只读从库：`read_only=1`可以将从库设置为只读，防止直接修改数据库中的数据。但是该配置对于具有超级用户权限的账户是无效的；并且一般也不建议使用`super_read_only=1`。
 
 
 

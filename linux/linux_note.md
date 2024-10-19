@@ -3205,7 +3205,28 @@ history -d <指定行号>
 
 ---
 
+#### 远程
 
+##### 文件传递
+
+1. scp ,即 Secure Copy Protocol ，用于在本地和远程主机之间安全地复制文件或目录，基于 SSH，传输过程中数据被加密。
+   1. 从本地复制到远程:`scp localfile user@remote_ip:/path/to/destination`
+   2. 从远程复制到本地：`scp user@remote_ip:/path/to/remotefile /local/destination`
+   3. 简单易用，适合快速文件传输。支持递归复制目录（使用 `-r` 选项）。不支持增量传输，复制时会完全传输文件。
+2.  rcp ,即 Remote Copy Protocol ，用于在本地和远程主机之间复制文件，不安全，传输过程中数据未加密。
+   1. 速度快，但不如 `scp` 安全，通常不推荐使用，也支持递归复制，但大多数现代系统已不再推荐使用 `rcp`，因为它被认为不安全，一般在较旧的系统中可用，现代系统多用 `scp` 或 `rsync` 代替。
+3. rsync ， 用于在本地和远程主机之间高效同步文件和目录，可通过 SSH 使用，传输过程可以加密。
+   1. 从本地复制到远程：`rsync -avz localfile user@remote_ip:/path/to/destination`
+   2. 从远程复制到本地：`rsync -avz user@remote_ip:/path/to/remotefile /local/destination`
+   3. 支持增量传输，只传输改变的部分，节省带宽和时间。支持多种选项，如压缩（`-z`）、详细输出（`-v`）、递归复制（`-r`）等。可以通过 `--delete` 选项同步时删除目标中不再存在的文件。非常适合备份和镜像文件夹。
+
+> 1. `scp` 和 `rsync`（通过 SSH）安全，`rcp` 不安全。
+> 2. `rsync` 高效，支持增量传输，`scp` 和 `rcp` 进行全量复制。
+> 3. `scp` 适合快速安全的文件复制，`rsync` 适合大规模的文件同步和备份，`rcp` 已不推荐使用。
+
+
+
+---
 
 #### bash脚本
 
