@@ -264,7 +264,12 @@
    1. [致美化](https://zhutix.com/tag/cursors/)找自己喜欢的鼠标样式下载解压([目前正在使用](https://zhutix.com/ico/breeze-snow-hd-cus/))，右键`.inf`文件安装鼠标样式。
    2. [LeoRH123/Windows-11-Cursor-Concept-Pro-v2.0](https://github.com/LeoRH123/Windows-11-Cursor-Concept-Pro-v2.0?tab=readme-ov-file)直接下载源文件，右键`.inf`文件安装鼠标样式。
 6. 搜狗输入法：可以配置一个打字跟随的输入法皮肤。
-7. 一些推荐字体：
+7. 软件启动器(下面几个比较火，体验了下感觉第一个比较适合我)：
+   1. [flowlauncher](https://www.flowlauncher.com/)(正在使用，配合everything很舒服)<br><img src="https://raw.githubusercontent.com/dreamfishyx/pictures/main/pic/202410201948233.png" style="zoom:67%;" />
+   2. [fluentsearch](https://fluentsearch.net/)
+   3. [utools](https://u.tools/)
+
+8. 一些推荐字体：
    1.  Fira Code：https://github.com/tonsky/FiraCode
    2.  Hack: https://github.com/source-foundry/Hack
    3. Inconsolata: https://github.com/googlefonts/Inconsolata

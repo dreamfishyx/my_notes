@@ -325,9 +325,7 @@ f52b63814da6efc0d3e5fa5d7ba5790698ee87a34c4fb2c15de9520155ea82cb
 
 ##### 运行
 
-1. 创建并启动容器：
-   1. 创建数据卷: `docker volume create random-image-api`。
-   2. 创建并运行容器: `docker run -v ~/random-image:/app/images -v ~/flask/log:/app/log -dp 5000:5000 --name image_api random-image-api`。
+1. 创建并启动容器：`docker run -v ~/random-image:/app/images -v ~/flask/log:/app/log -dp 5000:5000 --name image_api random-image-api`。
 2. 访问图片：
    1. 查看初始 api-key: `docker exec -it image_api cat /app/api_key.txt`，实际上其默认值为`f52b63814da6efc0d3e5fa5d7ba5790698ee87a34c4fb2c15de9520155ea82cb`。
    2. 访问格式为:`http://localhost:5000/random-image/<your_api_key>`(初始状态没有图片，无法访问，参考下面方式添加图片)。
