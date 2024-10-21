@@ -41,7 +41,7 @@
    # 指定配置文件的位置: ~/.docker_proxy.env
    docker_proxy_env="$HOME/.docker_proxy.env"
    
-   # 删除遗留配置文件(放置后续没有获取代理信息时沿用遗留的配置)
+   # 删除遗留配置文件(防止后续没有获取代理信息时沿用遗留的配置)
    rm -f ${docker_proxy_env}
    
    # 根据 windows 是否开启代理动态生成配置文件。
@@ -140,7 +140,7 @@
 
 1. 至于第二种配置方式(懒得配置测试，理论上可行，细节上可能会存在一些问题)，根据[官方文档](https://learn.microsoft.com/zh-cn/windows/wsl/networking):,我们可以直接通过`ip route show | grep -i default | awk '{ print $3}'` 获取到 windows 的 ip地址。
 
-2. 那么接下来就很简单(同上):配置`vim ~/.zshrc`( bash 则配置 `~/.bashrc`)，启动时生成 docker 代理的自定义配置文件(其实这里是一个 EnvironmentFile )，配置完成后不要忘记 `source ~/.zshrc`:你可以将自己的镜像加速排除在外。
+2. 那么接下来就很简单(同上):配置`vim ~/.zshrc`( bash 则配置 `~/.bashrc`)，启动时生成 docker 代理的自定义配置文件(一个 EnvironmentFile )，配置完成后不要忘记 `source ~/.zshrc`:你可以将自己的镜像加速排除在外。
 
    ```bash
    # 指定配置文件的位置: ~/.docker_proxy.env
@@ -149,7 +149,7 @@
    # 获取 windows 的 ip 地址
    proxy_ip=$(ip route show | grep -i default | awk 'NR==2 {print $3}')
    
-   # 删除遗留配置文件(放置后续没有获取代理信息时沿用遗留的配置)
+   # 删除遗留配置文件
    rm -f ${docker_proxy_env}
    
    # 这里的端口需要根据你的代理软件配置
@@ -166,14 +166,12 @@
    sudo vim /etc/systemd/system/docker.service.d/http-proxy.conf
    ```
 
-4. `http-proxy.conf` 文件内容如下(这里没有采用官方的配置 Environment 环境变量，而是使用 EnvironmentFile 提供一个环境变量配置文件):
+4. `http-proxy.conf` 文件内容如下:
 
    ```toml
    [Service]
    EnvironmentFile=- /home/fish/.docker_proxy.env
    ```
-
-   > EnvironmentFile 使用 `-` 在目录前，作用是忽略文件不存在。这样我们就可以根据主机的代理是否启动去动态的设置 docker 的代理。
 
 5. 在配置好代理后，你需要重新加载 systemd 配置并重启 Docker 服务，以使更改生效：
 
