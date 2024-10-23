@@ -37,6 +37,7 @@ def parse_dir(dir_path: str, content: list, level: int = 0):
         for file_name in file_names:
             if file_name.endswith('.md'):
                 file_path = os.path.relpath(os.path.join(dir_path, file_name), ROOT_PATH)
+                file_path = file_path.replace('\\', '/')  # 将路径中的反斜杠替换为正斜杠
                 file_content = f"- [{file_name[:-3]}](./{file_path})\n"
                 md_list.append(file_content)
 
