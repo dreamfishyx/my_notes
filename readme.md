@@ -24,7 +24,7 @@
 - [4.dockerfile](./docker/4.dockerfile.md)
 - [5.数据持久化和网络](./docker/5.数据持久化和网络.md)
 - [6.常见服务器的安装](./docker/6.常见服务器的安装.md)
-- [7.Docker Compose](./docker/7.Docker Compose.md)
+- [7.Docker-Compose](./docker/7.Docker-Compose.md)
 - [8.docker_ui和proxy](./docker/8.docker_ui和proxy.md)
 - [9.docker镜像中心](./docker/9.docker镜像中心.md)
 - [A.搭建docker镜像加速](./docker/A.搭建docker镜像加速.md)
