@@ -48,7 +48,7 @@
    if [ -n "$HTTP_PROXY" ] && [ -n "$HTTPS_PROXY" ]; then  
      echo "HTTP_PROXY=\"${HTTP_PROXY}\"" > ${docker_proxy_env}
      echo "HTTPS_PROXY=\"${HTTPS_PROXY}\"" >> ${docker_proxy_env}
-     echo "NO_PROXY=\"${NO_PROXY},docker.dreamsea.top\"" >> ${docker_proxy_env}
+     echo "NO_PROXY=\"${NO_PROXY},<docker镜像加速地址>\"" >> ${docker_proxy_env}
    fi
    ```
 
