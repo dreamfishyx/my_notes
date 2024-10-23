@@ -71,19 +71,3 @@ git push
 > git config --global http.version HTTP/1.1
 
 
-
-
-
-
-
-
-
-
-
-`os.walk(root_path)`：遍历指定的根目录，返回每个目录的路径、子目录和文件列表。
-
-`dirpath`：当前遍历到的目录的路径。
-
-`dirnames`：当前目录下的所有子目录的名称列表。
-
-`filenames`：当前目录下的所有文件的名称列表。
