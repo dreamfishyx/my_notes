@@ -19,7 +19,6 @@ class MdDir:
         self.dir_name = dir_name
         self.level = level
         self.md_list = md_list if md_list is not None else []
-        self.sub_dirs = []  # 用于存储子文件夹
 
 def parse_dir(dir_path: str, content: list, level: int = 0): 
     for dir_path, dir_names, file_names in os.walk(dir_path):
