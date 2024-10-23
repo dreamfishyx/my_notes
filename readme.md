@@ -32,11 +32,6 @@
 
 
 
-## java
-- [README](./java/README.md)
-
-
-
 ## mysql
 - [1.入门](./java/mysql/1.入门.md)
 - [oracle](./java/mysql/oracle.md)
@@ -69,13 +64,6 @@
 
 ## 整合
 - [1.problem](./java/ssm/整合/1.problem.md)
-
-
-
-## temp
-- [linux](./java/temp/linux.md)
-- [ssm](./java/temp/ssm.md)
-- [temp](./java/temp/temp.md)
 
 
 
