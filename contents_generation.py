@@ -41,7 +41,8 @@ def parse_dir(dir_path: str, content: list, level: int = 0):
                 md_list.append(file_content)
 
         if md_list:
-            md_list.sort()
+            # 排序
+            # md_list.sort()
             dir_name = os.path.basename(dir_path)
             dir_level = dir_path.count(os.sep) - ROOT_PATH.count(os.sep)
             new_dir = MdDir(dir_name, dir_level, md_list)

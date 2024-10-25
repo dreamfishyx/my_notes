@@ -52,10 +52,43 @@ for file in *; do
     rm "$file"
   fi
 done
-
 ```
 
+> 如果在使用 `cwebp` 转换图片时遇到错误，可能是因为输入图片的格式或完整性有问题。你可以尝试使用 ImageMagick 修复图片,如果你已经安装了 ImageMagick，可以使用以下命令将图片转换为临时格式 `convert "$file" -quality 100 "${file}"` ，然后再次尝试使用 cwebp  进行图片格式装换。具体逻辑如下:
 
+```bash
+#!/bin/bash
+
+cd /app/images || exit
+
+for file in *; do
+  # 跳过已经是 WEBP 格式的文件
+  if [[ "$file" == *.webp ]]; then
+    echo "$file is already in WEBP format. Skipping..."
+    continue
+  fi
+
+  # 检查文件是否为常见图片格式（jpg, png, gif等）
+   if file "$file" | grep -qE 'image|bitmap'; then
+   	# 尝试修复文件并覆盖原文件
+    convert "$file" -quality 100 "$file" 2>/dev/null
+    # 转换图片为 WEBP 格式
+    echo "Converting $file to WEBP format..."
+    cwebp -quiet "$file" -o "${file%.*}.webp"
+
+    # 检查转换是否成功
+    if [[ -f "${file%.*}.webp" ]]; then
+      echo "$file successfully converted. Deleting original..."
+      rm "$file"
+    else
+      echo "Failed to convert $file. Skipping deletion."
+    fi
+  else
+    echo "$file is not a supported image format. Deleting..."
+    rm "$file"
+  fi
+done
+```
 
 
 
