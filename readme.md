@@ -77,6 +77,13 @@
 
 ## linux
 - [linux_note](./linux/linux_note.md)
+- [systemd服务](./linux/systemd服务.md)
+- [常见防火墙](./linux/常见防火墙.md)
+
+
+
+## nginx
+- [1.简介和安装](./nginx/1.简介和安装.md)
 
 
 
