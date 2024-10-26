@@ -6,6 +6,13 @@
 
 
 
+## base
+- [HTTPS原理和TCP握手](./base/HTTPS原理和TCP握手.md)
+- [lua脚本语言](./base/lua脚本语言.md)
+- [VMware虚拟机配置](./base/VMware虚拟机配置.md)
+
+
+
 ## blog
 - [docker搭建mysql集群](./blog/docker搭建mysql集群.md)
 - [docker搭建随机图片api](./blog/docker搭建随机图片api.md)
@@ -19,6 +26,7 @@
 ## docker
 - [1.入门简介](./docker/1.入门简介.md)
 - [10.docker镜像中心](./docker/10.docker镜像中心.md)
+- [11.Docker_Swarm](./docker/11.Docker_Swarm.md)
 - [2.Docker镜像](./docker/2.Docker镜像.md)
 - [3.Docker容器](./docker/3.Docker容器.md)
 - [4.dockerfile](./docker/4.dockerfile.md)
