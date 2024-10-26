@@ -1,6 +1,6 @@
 ##### 创建虚拟机
 
-1. 这里选择 ubuntu24.04 的服务器版本,[下载地址](https://ubuntu.com/download/server#how-to-install-lts)(以后建立写熟悉各种linux发行版的安装，哈哈)。
+1. 这里选择 ubuntu24.04 的桌面版,[下载地址](https://ubuntu.com/download/desktop)(以后建立写熟悉各种linux发行版的安装，哈哈)。
 2. 开始安装，选择自定义模式(<font color=red>下面是学习 nginx 的配置，其他用途需要适当调整参数。</font>):<br><img src="./assets/image-20241025205840588.png" alt="image-20241025205840588" style="zoom:67%;" />
 3. 配置 ios 镜像:<br><img src="./assets/image-20241025214603742.png" alt="image-20241025214603742" style="zoom:67%;" />
 4. 设置用户名和密码:<br><img src="./assets/image-20241025214721214.png" alt="image-20241025214721214" style="zoom:67%;" />
