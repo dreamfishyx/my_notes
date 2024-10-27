@@ -68,6 +68,10 @@ VMware 提供了几种网络模式，每种模式适用于不同的场景。以�
       
       # 安装vim
       sudo apt install vim
+      
+      # 安装ssh
+      sudo apt install openssh-server
+      sudo systemctl enable --now ssh.service 
       ```
 
 3. 接下来就是配置静态 ip ,打开 VMware 的虚拟网络编辑器，然后点击更改设置:<br><img src="./assets/image-20241026161940972.png" alt="image-20241026161940972" style="zoom:67%;" />
