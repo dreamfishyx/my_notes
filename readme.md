@@ -7,6 +7,7 @@
 
 
 ## base
+- [dns解析](./base/dns解析.md)
 - [HTTPS原理和TCP握手](./base/HTTPS原理和TCP握手.md)
 - [lua脚本语言](./base/lua脚本语言.md)
 - [VMware虚拟机配置](./base/VMware虚拟机配置.md)
@@ -86,6 +87,7 @@
 ## nginx
 - [1.简介和安装](./nginx/1.简介和安装.md)
 - [2.目录和配置](./nginx/2.目录和配置.md)
+- [temp](./nginx/temp.md)
 
 
 

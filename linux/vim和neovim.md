@@ -239,13 +239,18 @@
 3. 然而很遗憾的是 wsl 中 `set clipboard=unnamed` 是无效的，但是 `set clipboard=unnamedplus` 可以起作用:
 
    1. `set clipboard=unnamed`将 Vim 的默认匿名寄存器（`""`）与系统剪贴板（`"*`）链接在一起。使用 `y`（复制）和 `p`（粘贴）操作时，操作会作用于系统剪贴板。
+
    2. `set clipboard=unnamedplus`将 Vim 的默认匿名寄存器（`""`）与系统剪贴板（`"+`）链接在一起。使用 `y` 和 `p` 操作时，内容会与 `"+` 寄存器同步。
+
    3. 其实到这里就很清楚，在绝大多数 linux 中: `"*` 指鼠标选中区域,桌面系统中可按鼠标中键粘贴。`"+` 指系统剪切板,桌面系统中可按 Ctrl+V 粘贴。因此，通常建议使用 `unnamedplus`，因为它通常与大多数 GUI 应用程序的剪贴板交互得更好。
 
+      > 有时候 wsl 可能需要安装剪贴板: `sudo pacman -S xclip`
+      >
+      > 1. 访问系统剪贴板: `xclip -o -selection clipboard`。
+      > 2. 访问选择剪贴板: `xclip -o -selection primary`。
 
 
-
-
+​	
 
 
 
