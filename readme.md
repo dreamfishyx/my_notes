@@ -84,6 +84,7 @@
 
 ## nginx
 - [1.简介和安装](./nginx/1.简介和安装.md)
+- [2.目录和配置](./nginx/2.目录和配置.md)
 
 
 
@@ -100,7 +101,7 @@
 - [18.ai](./other/18.ai.md)
 - [19.live2D_api自建](./other/19.live2D_api自建.md)
 - [2.typora](./other/2.typora.md)
-- [20.好用的docker镜像](./other/20.好用的docker镜像.md)
+- [20.实用docker镜像](./other/20.实用docker镜像.md)
 - [3.浏览器搜索技巧](./other/3.浏览器搜索技巧.md)
 - [4.mklink文件搬家](./other/4.mklink文件搬家.md)
 - [5.windows查找](./other/5.windows查找.md)
