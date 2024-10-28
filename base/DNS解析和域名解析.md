@@ -90,9 +90,9 @@
 
 #### 域名解析
 
-##### 配置域名解析
+##### 域名解析
 
-1. 泛解析: 是指将一个域名的子域名指向同一 IP 地址，而不需要为每个子域名单独配置 DNS 记录。通常使用星号`*`作为通配符。如设置 `*.dreamfish.cc` 指向某个 IP 地址，那么 `a.dreamfish.cc`、`b.dreamfish.cc`、`anything.dreamfish.cc` 等都将解析到同一个 IP 地址。
+1. 泛解析是指将一个域名的子域名指向同一 IP 地址，而不需要为每个子域名单独配置 DNS 记录。通常使用星号`*`作为通配符。如设置 `*.dreamfish.cc` 指向某个 IP 地址，那么 `a.dreamfish.cc`、`b.dreamfish.cc`、`anything.dreamfish.cc` 等都将解析到同一个 IP 地址。
 
 2. 当有多个子域名需要指向同一服务时，使用泛解析可以避免为每个子域名单独配置。
 
@@ -110,11 +110,11 @@
 
 ##### 域名解析记录
 1. 主要分为 A 记录、MX 记录、CNAME 记录、 NS 记录和 TXT 记录(其他不常用的略)：
-   1. A 记录: Address，用来指定域名对应的 IPv4 地址，A记录可以将多个域名解析到一个IP地址，但是不能将一个域名解析到多个IP地址。
+   1. A 记录: 将域名直接映射到一个 IPv4 地址，可以将多个域名解析到一个IP地址，但是不能将一个域名解析到多个IP地址。
    2. AAAA记录: 将域名直接映射到一个 IPv6 地址。
    3. MX 记录: Mail Exchange，就是可以将某个域名下的邮件服务器指向自己的Mail Server。
    4. CNAME 记录: Canonical Name，即别名解析，可以为一个域名设置一个或者多个别名。
    5. NS 记录: 为某个域名指定DNS解析服务器，也就是这个域名由指定的IP地址的DNS服务器取解析。
    6. TXT 记录: 为某个主机名或域名设置说明。
-2. 需要说明: A 记录和 MX 记录可以指向同一个 IP 。例如 dreamfish 的 A 记录和 MX 记录都指向 60.xxx.xxx.xxx ，xxx@dreamfish.cc 的邮件路由，DNS会将邮件发送到 60.xxx.xxx.xxx 所在的服务器，而正常通过Web请求的话仍然解析到A记录的IP地址。
+2. 需要说明: A 记录和 MX 记录可以指向同一个 IP。例如 dreamfish 的 A 记录和 MX 记录都指向 60.xxx.xxx.xxx ，xxx@dreamfish.cc 的邮件路由，DNS会将邮件发送到 60.xxx.xxx.xxx 所在的服务器，而正常通过Web请求的话仍然解析到A记录的IP地址。
 3. 后续尝试一下 MX 记录: 待补！
