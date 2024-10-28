@@ -78,6 +78,7 @@
 ## linux
 - [linux_note](./linux/linux_note.md)
 - [systemd服务](./linux/systemd服务.md)
+- [vim和neovim](./linux/vim和neovim.md)
 - [常见防火墙](./linux/常见防火墙.md)
 
 
@@ -92,16 +93,15 @@
 - [1.markdown](./other/1.markdown.md)
 - [10.termux](./other/10.termux.md)
 - [11.代理](./other/11.代理.md)
-- [12.neovim](./other/12.neovim.md)
+- [12.archlinux安装](./other/12.archlinux安装.md)
 - [13.hexo博客搭建](./other/13.hexo博客搭建.md)
 - [14.图床和jsdelivr](./other/14.图床和jsdelivr.md)
-- [15.archlinux安装](./other/15.archlinux安装.md)
+- [15.实用docker镜像](./other/15.实用docker镜像.md)
 - [16.云服务器](./other/16.云服务器.md)
 - [17.halo博客配置](./other/17.halo博客配置.md)
 - [18.ai](./other/18.ai.md)
 - [19.live2D_api自建](./other/19.live2D_api自建.md)
 - [2.typora](./other/2.typora.md)
-- [20.实用docker镜像](./other/20.实用docker镜像.md)
 - [3.浏览器搜索技巧](./other/3.浏览器搜索技巧.md)
 - [4.mklink文件搬家](./other/4.mklink文件搬家.md)
 - [5.windows查找](./other/5.windows查找.md)
