@@ -7,6 +7,7 @@
 
 
 ## base
+- [Cookie、Session和Token](./base/Cookie、Session和Token.md)
 - [DNS解析和域名解析](./base/DNS解析和域名解析.md)
 - [HTTPS原理和TCP握手](./base/HTTPS原理和TCP握手.md)
 - [lua脚本语言](./base/lua脚本语言.md)
@@ -88,6 +89,7 @@
 - [1.简介和安装](./nginx/1.简介和安装.md)
 - [2.目录和配置](./nginx/2.目录和配置.md)
 - [3.反向代理和负载均衡](./nginx/3.反向代理和负载均衡.md)
+- [4.动静分离和防盗链](./nginx/4.动静分离和防盗链.md)
 - [temp](./nginx/temp.md)
 
 
@@ -98,7 +100,7 @@
 - [11.代理](./other/11.代理.md)
 - [12.archlinux安装](./other/12.archlinux安装.md)
 - [13.hexo博客搭建](./other/13.hexo博客搭建.md)
-- [14.图床和jsdelivr](./other/14.图床和jsdelivr.md)
+- [14.some_fun](./other/14.some_fun.md)
 - [15.实用docker镜像](./other/15.实用docker镜像.md)
 - [16.云服务器](./other/16.云服务器.md)
 - [17.halo博客配置](./other/17.halo博客配置.md)
