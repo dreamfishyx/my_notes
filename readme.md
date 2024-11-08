@@ -22,6 +22,7 @@
 - [termux安装pgsql并暴露到公网](./blog/termux安装pgsql并暴露到公网.md)
 - [windows和wsl美化](./blog/windows和wsl美化.md)
 - [wsl配置docker代理](./blog/wsl配置docker代理.md)
+- [推荐几个常用的github项目](./blog/推荐几个常用的github项目.md)
 
 
 
@@ -107,6 +108,7 @@
 - [18.ai](./other/18.ai.md)
 - [19.live2D_api自建](./other/19.live2D_api自建.md)
 - [2.typora](./other/2.typora.md)
+- [20.windows模拟器](./other/20.windows模拟器.md)
 - [3.浏览器搜索技巧](./other/3.浏览器搜索技巧.md)
 - [4.mklink文件搬家](./other/4.mklink文件搬家.md)
 - [5.windows查找](./other/5.windows查找.md)
