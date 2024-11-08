@@ -207,3 +207,26 @@ VMware 提供了几种网络模式，每种模式适用于不同的场景。以�
    1. 修改主机名: `sudo vim /etc/hostname`
    2. 修改 ip 地址:` sudo vim /etc/netplan/01-network-manager-all.yaml`
 
+
+
+
+
+
+
+##### 启动移动硬盘中的系统
+
+1. 使用 win+S 搜索创建并并格式化磁盘分区，打开，记住安装系统的磁盘编号(我这里是 1 号):<br><img src="./assets/image-20241108221837669.png" alt="image-20241108221837669" style="zoom:67%;" />
+
+2. 使用管理员权限打开 VMware ，建一个空的虚拟机(选择稍后安装系统，不提供 ios文件)
+
+3. 编辑虚拟机设置，添加一个物理磁盘(若是存在虚拟磁盘，移除虚拟磁盘):<br><img src="./assets/image-20241108222122042.png" alt="image-20241108222122042" style="zoom:67%;" />
+
+4. 硬件类型选择硬盘，后一步虚拟磁盘类型默认,然后选择物理磁盘:<br><img src="./assets/image-20241108222227619.png" alt="image-20241108222227619" style="zoom:67%;" /><br><img src="./assets/image-20241108222247372.png" alt="image-20241108222247372" style="zoom:67%;" /><br><img src="./assets/image-20241108222330924.png" alt="image-20241108222330924" style="zoom:67%;" />
+
+5. 选择安装有系统的磁盘，应用整个磁盘():<br><img src="./assets/image-20241108222442935.png" alt="image-20241108222442935" style="zoom:67%;" /><br><img src="./assets/image-20241108222550756.png" alt="image-20241108222550756" style="zoom:67%;" />
+
+   > 若是此处不确定物理磁盘，可以试选使用单个分区，此时选择下一步就可以查看到磁盘的分区，确定是否是目标磁盘。
+
+6. 启动虚拟机，等待系统启动即可。<br><img src="./assets/image-20241108223212120.png" alt="image-20241108223212120" style="zoom:66%;" />
+
+   > 上述图片步骤上可能存在出入，该笔记是在使用 VMware 为移动硬盘安装 archlinux 时记录，此时使用的是安装系统是的虚拟机(移除虚拟磁盘，取消 ios 镜像文件挂载)，没有重新建一个空的虚拟机。
