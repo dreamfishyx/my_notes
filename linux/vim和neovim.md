@@ -1008,7 +1008,7 @@ set statusline+=\{…\}%3{codeium#GetStatusString()}
    > 2. termux:目前暂时无法使用
    >    1. `pkg install imagemagick wget curl`
    >    2. `pkg install luarocks`
-   >    3. `luarocks --lua-version=5.1 install magick`
+   >    3. `luarocks --lua-version=5.1 install magick`(先要安装lua5.1 `sudo pacman -S lua51`) 
    > 3. 提一下，下面两种安装方式的按照位置不同，可以通过报错信息选择按照方式。此外查看`luarocks list`
    >    1. `luarocks --local --lua-version=5.1 install magick`
    >    2. `sudo luarocks --lua-version=5.1 install magick`
