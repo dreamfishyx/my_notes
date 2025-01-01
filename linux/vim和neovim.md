@@ -234,7 +234,7 @@
       set clipboard=unnamed
       ```
 
-      > 对于 neovim ，则是添加 `vim.opt.clipboard = "unnamed"`。
+      > 对于 neovim ，则是添加 `vim.opt.clipboard = "unnamed"`或者 `vim.cmd[[set clipboard+=unnamedplus]]` (下面会提到)
 
 3. 然而很遗憾的是 wsl 中 `set clipboard=unnamed` 是无效的，但是 `set clipboard=unnamedplus` 可以起作用:
 
