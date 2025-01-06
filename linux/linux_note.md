@@ -827,6 +827,87 @@
 
    8. [菜鸟教程](https://www.runoob.com/regexp/regexp-syntax.html)
 
+
+
+##### fzf
+
+1. fzf 是一个非常流行的模糊搜索工具，广泛用于在文件系统中查找文件、目录、历史记录等。它可以与 zsh 、bash 等命令行工具进行集成。
+
+2. 安装:
+
+   ```bash
+   sudo pacman -S fzf
+   sudo apt install fzf
+   ```
+
+   
+
+
+
+##### rg
+
+1. ripgrep 是一个超快速的文件内容搜索工具，支持正则表达式，可以快速查找大文件或目录中的文本内容。
+
+2. 安装:
+
+   ```bash
+   sudo pacman -S ripgrep
+   sudo apt install ripgrep
+   ```
+
+3. 使用:
+
+   ```bash
+   # 搜索目录中的文本
+   rg "search_text" .
+   
+   # 搜索特定类型的文件
+   rg "search_text" --type js   # 搜索 JavaScript 文件
+   rg "search_text" --type py   # 搜索 Python 文件
+   ```
+
+   
+
+##### fd
+
+1. fd 是一个简单的、快速的命令行文件查找工具,作为 find 的替代品，支持正则表达式、文件类型过滤等。
+
+2. 安装:
+
+   ```bash
+   sudo pacman -S fd
+   sudo apt install fd-find
+   ```
+
+3. 使用
+
+
+
+
+
+
+
+##### ag
+
+1. ag 是另一个非常快速的文件内容搜索工具，通常比 grep 和 find 快，尤其适合在大项目中查找文本。
+
+2. 安装:
+
+   ```bash
+   sudo pacman -S the_silver_searcher
+   sudo apt install silversearcher-ag
+   ```
+
+3. 使用
+
+
+
+
+
+
+
+
+
 ---
 
 #### 文件压缩解压
