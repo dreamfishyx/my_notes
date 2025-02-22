@@ -10,8 +10,8 @@
 - [Cookie、Session和Token](./base/Cookie、Session和Token.md)
 - [DNS解析和域名解析](./base/DNS解析和域名解析.md)
 - [HTTPS原理和TCP握手](./base/HTTPS原理和TCP握手.md)
-- [VMware虚拟机配置](./base/VMware虚拟机配置.md)
 - [lua脚本语言](./base/lua脚本语言.md)
+- [VMware虚拟机配置](./base/VMware虚拟机配置.md)
 
 
 
@@ -56,13 +56,14 @@
 
 ## spingboot3
 - [1.jdk17新特性](./java/ssm/spingboot3/1.jdk17新特性.md)
+- [10.整合websocket](./java/ssm/spingboot3/10.整合websocket.md)
 - [2.快速入门](./java/ssm/spingboot3/2.快速入门.md)
 - [3.web开发](./java/ssm/spingboot3/3.web开发.md)
 - [4.请求参数处理](./java/ssm/spingboot3/4.请求参数处理.md)
 - [5.web开发(二)](./java/ssm/spingboot3/5.web开发(二).md)
 - [6.数据访问及单元测试](./java/ssm/spingboot3/6.数据访问及单元测试.md)
 - [7.基础特性与核心原理](./java/ssm/spingboot3/7.基础特性与核心原理.md)
-- [8.整合](./java/ssm/spingboot3/8.整合.md)
+- [8.整合分页插件](./java/ssm/spingboot3/8.整合分页插件.md)
 - [9.补充](./java/ssm/spingboot3/9.补充.md)
 
 
@@ -110,6 +111,7 @@
 - [2.typora](./other/2.typora.md)
 - [20.windows模拟器](./other/20.windows模拟器.md)
 - [21.hyprland桌面美化配置](./other/21.hyprland桌面美化配置.md)
+- [22.提示词](./other/22.提示词.md)
 - [3.浏览器搜索技巧](./other/3.浏览器搜索技巧.md)
 - [4.mklink文件搬家](./other/4.mklink文件搬家.md)
 - [5.windows查找](./other/5.windows查找.md)
