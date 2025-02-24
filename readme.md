@@ -9,6 +9,7 @@
 ## base
 - [Cookie、Session和Token](./base/Cookie、Session和Token.md)
 - [DNS解析和域名解析](./base/DNS解析和域名解析.md)
+- [git冲突](./base/git冲突.md)
 - [HTTPS原理和TCP握手](./base/HTTPS原理和TCP握手.md)
 - [lua脚本语言](./base/lua脚本语言.md)
 - [VMware虚拟机配置](./base/VMware虚拟机配置.md)
@@ -100,7 +101,7 @@
 - [1.markdown](./other/1.markdown.md)
 - [10.termux](./other/10.termux.md)
 - [11.代理](./other/11.代理.md)
-- [12.linux安装配置](./other/12.linux安装配置.md)
+- [12.archlinux配置](./other/12.archlinux配置.md)
 - [13.hexo博客搭建](./other/13.hexo博客搭建.md)
 - [14.some_fun](./other/14.some_fun.md)
 - [15.实用docker镜像](./other/15.实用docker镜像.md)
@@ -179,7 +180,8 @@
 
 
 ## redis7
-- [1.入门](./redis7/1.入门.md)
+- [1.入门与安装](./redis7/1.入门与安装.md)
+- [2.十大数据类型](./redis7/2.十大数据类型.md)
 
 
 
