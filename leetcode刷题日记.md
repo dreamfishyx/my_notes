@@ -14,14 +14,11 @@
 ```python
 class Solution:
     def rotate(self, nums: List[int], k: int) -> None:
-        """
-        Do not return anything, modify nums in-place instead.
-        """
         num = len(nums)
         arr = [0] * num
         for i in range(num):
-            arr[(i+k)%num] = nums[i]
-    
+            arr[(i+k) % num] = nums[i]
+
         for i in range(num):
             nums[i] = arr[i]   
 ```
@@ -31,7 +28,6 @@ class Solution:
 ```python
 class Solution:
     def rotate(self, nums: List[int], k: int) -> None:
-
         num = len(nums)
         i = 0 # 作为0号坑(存放待填坑的土)
         j = (i+k) % num # 挖个坑(第一个待填的位置)
@@ -54,11 +50,8 @@ class Solution:
 ```python
 class Solution:
     def rotate(self, nums: List[int], k: int) -> None:
-        """
-        Do not return anything, modify nums in-place instead.
-        """
         n = len(nums)
-        k = k % n 
+        k = k % n  # 去掉完整圈数
         self.reverse(nums, 0, n - 1)
         self.reverse(nums, 0, k - 1)
         self.reverse(nums, k, n - 1)
