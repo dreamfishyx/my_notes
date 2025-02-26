@@ -69,3 +69,74 @@ class Solution:
 
 
 
+##### 2.26
+
+[设计浏览器历史记录](https://leetcode.cn/problems/design-browser-history)
+
+> - python 中原生的栈
+> - Python 的 list 是动态数组，可以根据需要自动调整大小。
+> - 顺便回顾一下 python 语法，python 切片
+
+其实在看到设计浏览器历史时，就应该想到数据结构中的栈，但是在使用 传统数组和 list 之间犯难。若是采用其他语言刷题，或许需要根据题目设置 5000 长度数组(为啥是5000，题目说每种方法调用次数最多5000)。但是Python 的 list 是动态数组，可以根据需要自动调整大小，就可以无需考虑这个问题。
+
+但是很多时候想法很好的，但是实际操作起来还是会发生很多问题。由于 python 的切片操作可以很方便的对数组和列表进行截取操作，切片在本题中实现连续弹出是很方便的。但是方便都是有代价的，由于切片操作不改变原来数组，那么不难猜测其底层应该会存在复制操作，这就必然会损耗时间。而对于栈，其实我们并没有必要直接删除，直接采用逻辑删除，入栈覆盖的方式，就省去了底层复制的时间。
+
+其实到这里还没有引入关键问题，那就是在本题中，我想将 list 和 逻辑删除 结合。但是list 不能像数组那样直接通过索引插入元素。如果你尝试在一个特定索引位置插入元素，而该位置超出了当前列表的长度，会引发 IndexError。在本题的 visit 方法中，我们若是逻辑删除，就需要判断是采用覆盖的方式，还是采用 append 的方式，这其实是无法判断的(当然前提是你不增加其他标志，如 list 已使用的最大长度，但是这会打乱代码逻辑)。
+
+遇到的坑大致就是这些，下面给出逻辑删除和切片截取的代码实现:
+
+采用原始数组实现，通过栈顶指针 index 实现逻辑删除，size 记录总数据
+
+```python
+class BrowserHistory:
+
+    def __init__(self, homepage: str):
+        # 初始化栈
+        self.stack = [0 for _ in range(5000)] 
+        self.stack[0] = homepage
+        # index: 栈顶指针, size: 记录的总数
+        self.index, self.size = 0, 1
+
+    def visit(self, url: str) -> None:
+        # 删除前进记录(逻辑上的删除)
+        self.index += 1
+        self.size  = self.index + 1
+        # 添加新的历史记录(覆盖)
+        self.stack[self.index] = url
+
+    def back(self, steps: int) -> str:
+        # 在第 index+1 条记录，最多只能回退 index -1 步(除去当前和最初)
+        self.index = max(0, self.index - steps)
+        return self.stack[self.index]
+            
+    def forward(self, steps: int) -> str:
+        # 在第 index+1 条记录，最多只能前进 size-index 步(除去当前和最后)
+        self.index = min(self.size-1, self.index + steps)
+        return self.stack[self.index]
+```
+
+采用 list 和 切片实现,代码简洁许多，但是实际上切片中可能存在复制行为，会损耗一定时间。
+
+```python
+class BrowserHistory:
+
+    def __init__(self, homepage: str):
+        self.stack = [homepage]
+        self.index = 0
+
+    def visit(self, url: str) -> None:
+        self.index += 1
+        # 直接截取
+        self.stack[self.index:] = [url] 
+
+    def back(self, steps: int) -> str:
+        # 最多只能推到 0
+        self.index = max(0, self.index - steps)
+        return self.stack[self.index]
+            
+    def forward(self, steps: int) -> str:
+        # 最多只能推到 len(stack) - 1
+        self.index = min(len(self.stack) - 1, self.index + steps)
+        return self.stack[self.index]
+```
+
