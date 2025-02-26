@@ -4,7 +4,7 @@
 
 [轮转数组](https://leetcode.cn/problems/rotate-array/)
 
-> - 考虑特殊情况，K大于arr.length时，需要忽略完整圈数
+> - 考虑特殊情况，k大于arr.length时，需要忽略完整圈数
 > - 对于 python 切片，很容易就实现 `nums[:] = nums[num - k:] + nums[:num - k] `，这一解法演变出最后面的结题方式。
 
 首先一般数组移位的题目，一般都是涉及到双指针的问题，而轮转又往往涉及到取余实现循环遍历。
@@ -73,9 +73,9 @@ class Solution:
 
 [设计浏览器历史记录](https://leetcode.cn/problems/design-browser-history)
 
-> - python 中原生的栈
+> - Python 中没有专门的栈数据结构，但可以用 list 来实现栈，list 提供 append() 和 pop() 方法，可以方便地用来模拟栈的操作。
 > - Python 的 list 是动态数组，可以根据需要自动调整大小。
-> - 顺便回顾一下 python 语法，python 切片
+> - 顺便回顾一下 python 语法，Python中的切片访问默认为左闭右开。
 
 其实在看到设计浏览器历史时，就应该想到数据结构中的栈，但是在使用 传统数组和 list 之间犯难。若是采用其他语言刷题，或许需要根据题目设置 5000 长度数组(为啥是5000，题目说每种方法调用次数最多5000)。但是Python 的 list 是动态数组，可以根据需要自动调整大小，就可以无需考虑这个问题。
 
