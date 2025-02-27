@@ -1,5 +1,11 @@
 #### 2025
 
+
+
+**将零星的星火沉淀为银河，是文字赋予思考的温柔仪式————Deepseek**
+
+
+
 ##### 2.25
 
 [189.轮转数组](https://leetcode.cn/problems/rotate-array/)
