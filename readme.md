@@ -10,7 +10,7 @@
 ## base
 - [Cookie、Session和Token](./base/Cookie、Session和Token.md)
 - [DNS解析和域名解析](./base/DNS解析和域名解析.md)
-- [git冲突](./base/git冲突.md)
+- [git常用](./base/git常用.md)
 - [HTTPS原理和TCP握手](./base/HTTPS原理和TCP握手.md)
 - [lua脚本语言](./base/lua脚本语言.md)
 - [VMware虚拟机配置](./base/VMware虚拟机配置.md)
@@ -20,7 +20,6 @@
 ## blog
 - [docker搭建mysql集群](./blog/docker搭建mysql集群.md)
 - [docker搭建随机图片api](./blog/docker搭建随机图片api.md)
-- [temp](./blog/temp.md)
 - [termux安装pgsql并暴露到公网](./blog/termux安装pgsql并暴露到公网.md)
 - [windows和wsl美化](./blog/windows和wsl美化.md)
 - [wsl配置docker代理](./blog/wsl配置docker代理.md)
