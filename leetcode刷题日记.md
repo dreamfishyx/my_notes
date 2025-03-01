@@ -512,7 +512,6 @@ class Heap:
     def minHeapify(self,i): 
         temp = self.arr[i]  # 保存当前节点的值
         k = 2*i+1
-        # 不要在for循环的条件中使用变量，因为变量会在循环中改变！！！
         while k < self.size:
             # 选取左右孩子中较小的一个(相等时选左孩子)
             if k+1 < self.size and self.arr[k] > self.arr[k+1]:
@@ -593,6 +592,124 @@ class FoodRatings:
 <br><img src="./assets/image-20250228115423907.png" alt="image-20250228115423907" style="zoom:67%;" />
 
 
+
+
+
+#### 三月
+
+##### 3.1
+
+[131. 分割回文串](https://leetcode.cn/problems/palindrome-partitioning)
+
+> - python中递归函数不要使用默认参数:默认参数在函数定义时就被创建，并在所有函数调用之间共享。
+> - 此外，pyton中参数是否会复制，以及 list 是否
+
+如何判断一个字符串是回文串？倒序遍历的结果与正序一致或者从两端向中间遍历，每次遍历字符一致。
+
+```python
+def adjust(self, head: int, tail: int) -> bool:
+    while head < tail:
+        if self.s[head] != self.s[tail]:
+            return False
+        head += 1
+        tail -= 1
+    return True
+
+def adjust(self, head: int, tail: int) -> bool:
+    s = self.s[head:tail+1]
+    return s == s[::-1]
+```
+
+此外，对于返回全部方案，是否存在这样一种情况，在 A 方案中，我们判断 xxx 是回文串，那么到 B 方案中，我们如何避免再次判断？
+
+那么具体如何解决这个问题，其实稍微尝试一下，大致可以知道对于每一个结果集的下一个结果，是存在多种可能的，类似一种树形结构，对此我还是通过 dfs + 剪枝完成:
+
+```python
+from typing import List
+
+class Solution:
+    def partition(self, s: str) -> List[List[str]]:
+        self.s = s
+        p = 0 # 遍历指针
+        self.res_list = []
+        self.dfs(s, p, [])
+        return self.res_list
+
+
+    def dfs(self, s: str, p:int, res: List[str])->None:
+        if p == len(s):
+            # 可变对象，传参传的是引用
+            self.res_list.append(res[:])
+            return
+        # [p, i] 是回文串?
+        for i in range(p, len(s)):
+            if self.adjust(p, i):
+                res.append(s[p:i+1])
+                self.dfs(s, i+1, res)
+                res.pop() # 回溯
+    
+    def adjust(self, head: int, tail: int) -> bool:
+        while head < tail:
+            if self.s[head] != self.s[tail]:
+                return False
+            head += 1
+            tail -= 1
+        return True
+```
+
+回到刚开始的问题，是否能避免每次重复判断某个子串是否为回文子串？牺牲空间换时间，设置一个二维数组:
+
+```python
+from typing import List
+
+class Solution:
+    def partition(self, s: str) -> List[List[str]]:
+        self.s = s
+        p = 0 # 遍历指针
+        self.res_list = [] # 结果集
+        # 判断记录
+        self.judge = [[0 for _ in range(len(s))] for _ in range(len(s))] 
+        self.dfs(s, p, [])
+        return self.res_list
+
+
+    def dfs(self, s: str, p:int, res: List[str])->None:
+        if p == len(s):
+            # 可变对象，传参传的是引用
+            self.res_list.append(res[:])
+            return
+        # [p, i] 是回文串?
+        for i in range(p, len(s)):
+            if self.adjust(p, i):
+                res.append(s[p:i+1])
+                self.dfs(s, i+1, res)
+                res.pop() # 回溯
+    
+    def adjust(self, head: int, tail: int) -> bool:
+        # 从判断记录中找结果
+        if self.judge[head][tail] == 1:
+            return True
+        elif self.judge[head][tail] == -1:
+            return False
+        # 没有判断过
+        while head < tail:
+            if self.s[head] != self.s[tail]:
+                self.judge[head][tail] = -1 # 记录
+                return False
+            head += 1
+            tail -= 1
+        self.judge[head][tail] = 1 # 记录
+        return True
+```
+
+满心欢喜的提交，但是从力扣执行结果而言，提升并不明显，甚至还慢了!!!<br><img src="./assets/image-20250301093420637.png" alt="image-20250301093420637" style="zoom:80%;" />
+<br><img src="./assets/image-20250301093337438.png" alt="image-20250301093337438" style="zoom:67%;" />
+
+那么暴力遍历是否能解决这个问题呢，哪怕代价极高？俺不知道也不想知道。但是在查看官方题解的时候，发现官方对于回文串的判断使用动态规划，例如对于一个串 abcba 我们想知道它是不是回文串，我们只要知道两件事就可以判断：去掉两端的子串 bcb 是不是回文串，以及两端是否相等(a=a?)。
+
+但是我有一个问题，这也是我每次遇到动态规划都会想半天的东西，那就是我的子问题一定会在此之前得到答案吗？也就是说 bcb 是否为回文串这个答案一定会在我判断 abcba 之前知道吗？显然a->bac->…然后才是 abcba动态规划通过自底向上的填表顺序，确保子问题的解在父问题之前被计算。
+
+动态规划这种方法，想明白就简单方便，想不明白，emm…越看越觉得它在忽悠我。
 
 
 
