@@ -621,7 +621,7 @@ def adjust(self, head: int, tail: int) -> bool:
 
 此外，对于返回全部方案，是否存在这样一种情况，在 A 方案中，我们判断 xxx 是回文串，那么到 B 方案中，我们如何避免再次判断？
 
-那么具体如何解决这个问题，其实稍微尝试一下，大致可以知道对于每一个结果集的下一个结果，是存在多种可能的，类似一种树形结构，对此我还是通过 dfs + 剪枝完成:
+那么具体如何解决这个问题，其实稍微尝试一下，大致可以知道对于每一个结果集的下一个结果，是存在多种可能的，类似一种树形结构，对此我还是通过 dfs + 回溯完成:
 
 ```python
 from typing import List
@@ -706,9 +706,89 @@ class Solution:
 
 那么暴力遍历是否能解决这个问题呢，哪怕代价极高？俺不知道也不想知道。但是在查看官方题解的时候，发现官方对于回文串的判断使用动态规划，例如对于一个串 abcba 我们想知道它是不是回文串，我们只要知道两件事就可以判断：去掉两端的子串 bcb 是不是回文串，以及两端是否相等(a=a?)。
 
-但是我有一个问题，这也是我每次遇到动态规划都会想半天的东西，那就是我的子问题一定会在此之前得到答案吗？也就是说 bcb 是否为回文串这个答案一定会在我判断 abcba 之前知道吗？显然a->bac->…然后才是 abcba，动态规划通过自底向上的填表顺序，确保子问题的解在父问题之前被计算。
+但是我有一个问题，这也是我每次遇到动态规划都会想半天的东西，那就是我的子问题一定会在此之前得到答案吗？也就是说 bcb 是否为回文串这个答案一定会在我判断 abcba 之前知道吗？我又如何确保？这是每次使用动态规划都会遇到的难点！！！(自底向上、自顶向下)
 
 动态规划这种方法，想明白就简单方便，想不明白，emm…越看越觉得它在忽悠我。
 
 
+
+
+
+
+
+##### 3.2
+
+[132. 分割回文串 II](https://leetcode.cn/problems/palindrome-partitioning-ii)
+
+看到最小次数，emmm…我直接贪心，每次保证取得最长回文子串。贪心问题一般需要考虑三个问题: 想贪、咋贪、凭啥贪。但是这题emmm…不敢贪，好吧，自娱自乐一下。贪心问题最重要的是找到局部最优解，并且局部最优要直接导向全局最优。但是这题，若是我们每次取最长回文子串，其实会导致一个问题:会影响后面的回文串结构，导致原本可以组成回文的串被迫拆为多个<br><img src="./assets/image-20250302090616575.png" alt="image-20250302090616575" style="zoom:75%;" />
+
+那么，老老实实来吧，昨天的回文串我们已经找到所有的分割方式，那所有的都找了，最小分割不也就有了，无非就是时间代价有点大。当然还是解决一下昨天的遗留问题，动态规划，在昨天的问题中得到 `f[i][j] = (s[i] == s[j]) and f[i + 1][j - 1]`,显然通过表达式知道 i 需要从大到小算，而 j 需要从小到大算，那么前提已经研究清楚，结果也是超时了:
+
+```python
+class Solution:
+    def minCut(self, s: str) -> int:
+        self.s = s
+        self.n = len(s)
+        self.dp = [[True] * self.n for _ in range(self.n)]
+        # 动态规划预处理
+        for i in range(self.n - 1, -1, -1):
+            for j in range(i + 1, self.n):
+                # 忽略 i=j 的情况
+                if j - i == 1:
+                    self.dp[i][j] = s[i] == s[j]
+                else:
+                    self.dp[i][j] = self.dp[i + 1][j - 1] and (s[i] == s[j])
+        # 初始化最小回文串分割次数
+        self.min_cut = self.n - 1 
+        self.dfs(0, 0)
+        return self.min_cut
+    
+    def dfs(self, start, cut):
+        if start == self.n:
+            # 越界，此时cut记录的是分割段数，需要减1才是分割次数
+            self.min_cut = min(self.min_cut, cut - 1)
+            return   
+        if cut >= self.min_cut: # 剪枝(不是最小分割次数，没必要继续)
+            return  
+        for i in range(start, self.n):
+            if self.dp[start][i]:
+                self.dfs(i + 1, cut + 1) 
+```
+
+贪心贪不了，dfs 又超时……哪怕知道是使用动态规划也是毫无头绪。
+
+根据官方的方法，我们依次求出 [0:n] 状态下的最优解(最短分割),然后对于 [0:m] (m > n) 状态，我们尝试在之前的最优解的基础上( 以 n 为跳板 )继续寻求最优，最后取最小值记作当前状态的最优解。一句话说，整体的解(没说最优)是如何组成的？是由末尾回文子串+前面部分分割方案组成，而这种组成不唯一，我们取最优的那一个，即前面部分分割最优，进而根据末尾回文子串的选取不同得到一个个子问题。
+
+```python
+class Solution:
+    def minCut(self, s: str) -> int:
+        self.s = s
+        self.n = len(s)
+        self.dp = [[True] * self.n for _ in range(self.n)]
+        # 动态规划预处理
+        for i in range(self.n - 1, -1, -1):
+            for j in range(i + 1, self.n):
+                # 忽略 i=j 的情况
+                if j - i == 1:
+                    self.dp[i][j] = s[i] == s[j]
+                else:
+                    self.dp[i][j] = self.dp[i + 1][j - 1] and (s[i] == s[j])
+        # 记录[0, i]的最小分割次数
+        self.min_cut = [0] * self.n
+
+        for i in range(1, self.n):
+            # 回文串，无需分割
+            if self.dp[0][i]:
+                self.min_cut[i] = 0
+            else:
+                # 取最坏情况
+                self.min_cut[i] = self.min_cut[i - 1] + 1
+                for j in range(1, i):
+                    if self.dp[j][i]: # 取末尾回文子串
+                        # 根据末尾回文子串的选取,计算各个情况下的最小分割次数，取最小值
+                        self.min_cut[i] = min(self.min_cut[i], self.min_cut[j - 1] + 1)
+        return self.min_cut[-1]
+```
+
+这个动态规划的方式与昨天(上面的解法)不同的是，父问题的解依赖一群子问题的解，无法判断当前状态是从哪一个子状态转化而来，这种状态转移对我来说还是有点难想。贪心和动态规划也算是力扣上的”黑白无常“了，拼尽全力无法与之匹敌！刷题嘛，慢慢来吧！！！<br><img src="./assets/image-20250302100655153.gif" alt="image-20250302100655153" style="zoom:75%;" />
 
