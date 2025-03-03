@@ -792,3 +792,121 @@ class Solution:
 
 这个动态规划的方式与昨天(上面的解法)不同的是，父问题的解依赖一群子问题的解，无法判断当前状态是从哪一个子状态转化而来，这种状态转移对我来说还是有点难想。贪心和动态规划也算是力扣上的”黑白无常“了，拼尽全力无法与之匹敌！刷题嘛，慢慢来吧！！！<br><img src="./assets/image-20250302100655153.gif" alt="image-20250302100655153" style="zoom:75%;" />
 
+
+
+
+
+##### 3.3
+
+[1278. 分割回文串 III](https://leetcode.cn/problems/palindrome-partitioning-iii)
+
+参照前两天的题，其实也猜到了今天依旧是动态规划，首先肯定分析问题，尝试将其数学化，定义状态并确定状态方程。下面我们忽略边界的开闭，简单整理一下思路:对于一个字符串S,我们将其分为 k 个回文串修改最小次数记为 $f(n,k)$,那么其实接下来的思路就和昨天的回文串II类似，我们向前推一个子串$(n-k,n]$那么得到一个子问题$f(n-k,k-1)$，那么记$(n-k,n]$转换为回文串的最小代价为$m$,那么显然$f(n,k)=min(f(n-k,k-1)+m)$。描述的有些粗糙，但是大致是这个意思,写出以下代码，<font color=red>但是很遗憾超时了</font>。
+
+```python
+class Solution:
+    def palindromePartition(self, s: str, k: int) -> int:
+        self.dp = [[True]*len(s) for _ in range(len(s))]
+        self.len = len(s)
+        for i in range(len(s)-1,-1,-1):
+            for j in range(i+1,len(s)):
+                self.dp[i][j] = self.dp[i+1][j-1] and s[i] == s[j]
+        return self.minReplace(s,len(s)-1,k)
+
+    def minReplace(self, s: str, end: int, k: int) -> int:
+        mim_rep = self.len # 用于记录最小替换次数
+        if k == 0 and end == -1: #此时恰好分为k个回文串
+            return 0
+        elif k == 0 or end == -1: # 此时不可能分为k个回文串,设为len让其无法被选中
+            return self.len
+        for i in range(end,-1,-1):
+            if self.dp[i][end]:
+                mim_rep = min(mim_rep, self.minReplace(s,i-1,k-1))
+            else:
+                mim_rep= min(mim_rep, self.minReplace(s,i-1,k-1) + self.replace(s,i,end))
+        return mim_rep
+
+
+    def replace(self, s: str, start: int, end: int) -> int:
+        count = 0
+        while start < end:
+            if s[start] != s[end]:
+                count += 1
+            start += 1
+            end -= 1
+        return count
+```
+
+动态规划结题，有时会涉及重复调用问题，此时就要考虑记忆搜索，避免多次计算相同子问题。这里最关键的无非是$n、k$,我们将其作为键去存储计算结果，每次先去记录中找，找不到再计算，并把结果保存到记录中。当然其实在前几次的官方题解中，可以学到一招叫做 `@cache`,给出如下代码:
+
+```python
+from functools import cache
+
+class Solution:
+    def palindromePartition(self, s: str, k: int) -> int:
+        self.dp = [[True]*len(s) for _ in range(len(s))]
+        self.len = len(s)
+        for i in range(len(s)-1,-1,-1):
+            for j in range(i+1,len(s)):
+                self.dp[i][j] = self.dp[i+1][j-1] and s[i] == s[j]
+        return self.minReplace(s,len(s)-1,k)
+
+    @cache
+    def minReplace(self, s: str, end: int, k: int) -> int:
+        mim_rep = self.len # 用于记录最小替换次数
+        if k == 0 and end == -1: #此时恰好分为k个回文串
+            return 0
+        elif k == 0 or end == -1: # 此时不可能分为k个回文串,设为len让其无法被选中
+            return self.len
+        for i in range(end,-1,-1):
+            if self.dp[i][end]:
+                mim_rep = min(mim_rep, self.minReplace(s,i-1,k-1))
+            else:
+                mim_rep= min(mim_rep, self.minReplace(s,i-1,k-1) + self.replace(s,i,end))
+        return mim_rep
+
+
+    def replace(self, s: str, start: int, end: int) -> int:
+        count = 0
+        while start < end:
+            if s[start] != s[end]:
+                count += 1
+            start += 1
+            end -= 1
+        return count
+```
+
+其实还是有点好奇，满足(n,k)挺难的吧，真的会那么多次命中记录？我尝试在本地运行代码:第一个使用缓存基本秒出答案，第二个没用缓存等半天手动终止了<br><img src="./assets/image-20250303100655223.png" alt="image-20250303100655223" style="zoom:75%;" />
+
+其实回过头来仔细想想，当$n、k$比较大时，由于我们每次取末尾子串的情况足够复杂，多次取不同长度子串，最好导致不同取法所得结果(依赖的子问题)的$n、k$一致的概率(命中缓存记录)还是很大的。
+
+当然还是老样子，看一下官方的题解，官方使用的是循环实现，这本身问题不大(只是递归对我而言熟悉一些)，但是在官方的第二种结题方式中使用预处理，提前计算了各个子串变为回文串的最小代价。为什么要这样做？回看我的代码，其实它仍有不完善的地方，$self.replace(s,i,end))$显然也是可以缓存的，也存在重复计算的情况，此外也不难看出这又是一个动态规划问题，而且和判断回文串其实差别不大，于是重新优化代码:
+
+```python
+from functools import cache
+
+class Solution:
+    def palindromePartition(self, s: str, k: int) -> int:
+        self.len = len(s)
+        self.dp = [[0]*len(s) for _ in range(len(s))]
+        # 预处理
+        for i in range(self.len-1,-1,-1):
+            for j in range(i+1,self.len):
+                if s[i] == s[j]:
+                    self.dp[i][j] = self.dp[i+1][j-1]
+                else:
+                    self.dp[i][j] = self.dp[i+1][j-1] + 1
+                # self.dp[i][j] = self.dp[i+1][j-1] + (1 if s[i] != s[j] else 0)
+        return self.minReplace(s,len(s)-1,k)
+
+    @cache
+    def minReplace(self, s: str, end: int, k: int) -> int:
+        mim_rep = self.len # 用于记录最小替换次数
+        if k == 0 and end == -1: #此时恰好分为k个回文串
+            return 0
+        elif k == 0 or end == -1: # 此时不可能分为k个回文串,设为len让其无法被选中
+            return self.len
+        for i in range(end,-1,-1):
+            mim_rep = min(mim_rep,self.minReplace(s,i-1,k-1)+self.dp[i][end])
+        return mim_rep
+```
+
