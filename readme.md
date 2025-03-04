@@ -186,7 +186,8 @@
 - [3.十大数据类型(2)](./redis7/3.十大数据类型(2).md)
 - [4.入门使用](./redis7/4.入门使用.md)
 - [5.集群](./redis7/5.集群.md)
-- [6.高级篇](./redis7/6.高级篇.md)
+- [6.springboot集成redis](./redis7/6.springboot集成redis.md)
+- [7.高级篇](./redis7/7.高级篇.md)
 - [temp](./redis7/temp.md)
 
 
