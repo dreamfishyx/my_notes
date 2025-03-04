@@ -910,3 +910,39 @@ class Solution:
         return mim_rep
 ```
 
+
+
+
+
+##### 3.4
+
+[1745. 分割回文串 IV](https://leetcode.cn/problems/palindrome-partitioning-iv)
+
+判断一个字符串能否分割为三个非空回文子串，三个子串，两个分割点，两层循环即可:
+
+```python
+class Solution:
+    def checkPartitioning(self, s: str) -> bool:
+        self.s = s
+        self.n = len(s)
+        # 不符合参赛要求
+        if self.n < 3:
+            return False
+        # 动态规划预处理
+        self.dp = [[True] * self.n for _ in range(self.n)]
+        for i in range(self.n - 1, -1, -1):
+            for j in range(i + 1, self.n):
+                # 当j-1 > i+1(j=i+1)时，默认值为True
+                self.dp[i][j] = self.dp[i + 1][j - 1] and s[i] == s[j]
+        
+        # 分三段找两个分割点[0,i-1], [i,j-1], [j,n-1]
+        # i的取值范围[1, n-2]（保证三段都有字符）
+        for i in range(1, self.n - 1): 
+            # j的取值范围[i+1, n-1](保证第二、三段有字符)
+            for j in range(i + 1, self.n): 
+                if self.dp[0][i - 1] and self.dp[i][j - 1] and self.dp[j][self.n - 1]:
+                    return True
+        return False
+```
+
+标个困难题吓唬我是吧！！！<br><img src="./assets/image-20250304085348080.png" alt="我思故我在，生日快乐，梦鱼！" style="zoom:67%;" />
