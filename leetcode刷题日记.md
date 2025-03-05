@@ -946,3 +946,30 @@ class Solution:
 ```
 
 标个困难题吓唬我是吧！！！<br><img src="./assets/image-20250304085348080.png" alt="我思故我在，生日快乐，梦鱼！" style="zoom:67%;" />
+
+
+
+
+
+
+
+##### 3.5
+
+[1328. 破坏回文串](https://leetcode.cn/problems/break-a-palindrome)
+
+首先题目提到一个无法做到的情况，对于任意一个长度大于 1 的字符串，都是可以存在返回值的(其实写到后面才知道没有懂题目的意图，啥情况下无论修改字符都是回文串？奇数中间)。其次那么我们是否需要每次重新判断是否回文串？不需要，~~对于长度大于 1 回文串我们改动任意字符都会使其不再满足回文~~，对于回文串我们改动任意字符(不包含奇数长度的最中间字符)都会使其不再满足回文。要修改后的字典最小，那就尽量从左向右，尽量将字母改小->非a改a，是a的改不了，下一位。当然由于回文串的特性，我们只需要改一半就行(对称)。<font color=red>当所给回文串是奇数长度，修改中间字符后仍是回文串，不满足题意！！！！！！</font>
+
+```python
+class Solution:
+    def breakPalindrome(self, palindrome: str) -> str:
+        if len(palindrome) == 1:
+            return ""
+        # 从左到右遍历，找到第一个不是a的字符，将其改为a
+        for i in range(len(palindrome) // 2):
+            if palindrome[i] != 'a':
+                return palindrome[:i] + 'a' + palindrome[i + 1:]
+        # 如果全是a，将最后一个字符改为b
+        return palindrome[:-1] + 'b'
+```
+
+看了下官方题解，说这就叫贪心，我都没往贪心那儿想。emmm……难道说贪心是人的本能？不要啊大锅，俺想做个好人！！！<br><img src="./assets/image-20250305085721817.gif" alt="image-20250305085721817" style="zoom:66%;" />
