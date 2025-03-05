@@ -56,23 +56,8 @@
 
 
 
-## spingboot3
-- [1.jdk17新特性](./java/ssm/spingboot3/1.jdk17新特性.md)
-- [10.整合websocket](./java/ssm/spingboot3/10.整合websocket.md)
-- [2.快速入门](./java/ssm/spingboot3/2.快速入门.md)
-- [3.web开发](./java/ssm/spingboot3/3.web开发.md)
-- [4.请求参数处理](./java/ssm/spingboot3/4.请求参数处理.md)
-- [5.web开发(二)](./java/ssm/spingboot3/5.web开发(二).md)
-- [6.数据访问及单元测试](./java/ssm/spingboot3/6.数据访问及单元测试.md)
-- [7.基础特性与核心原理](./java/ssm/spingboot3/7.基础特性与核心原理.md)
-- [8.整合分页插件](./java/ssm/spingboot3/8.整合分页插件.md)
-- [9.补充](./java/ssm/spingboot3/9.补充.md)
-
-
-
 ## spring5
 - [0.spring](./java/ssm/spring5/0.spring.md)
-- [1.IOC与DI](./java/ssm/spring5/1.IOC与DI.md)
 
 
 
@@ -192,8 +177,23 @@
 
 
 
+## spingboot3
+- [1.jdk17新特性](./spingboot3/1.jdk17新特性.md)
+- [2.快速入门](./spingboot3/2.快速入门.md)
+- [3.web开发](./spingboot3/3.web开发.md)
+- [4.请求参数处理](./spingboot3/4.请求参数处理.md)
+- [5.web开发(二)](./spingboot3/5.web开发(二).md)
+- [6.数据访问及单元测试](./spingboot3/6.数据访问及单元测试.md)
+- [7.基础特性与核心原理](./spingboot3/7.基础特性与核心原理.md)
+- [8.整合](./spingboot3/8.整合.md)
+- [9.swagger使用](./spingboot3/9.swagger使用.md)
+- [A.补充](./spingboot3/A.补充.md)
+
+
+
 ## springcloud
 - [1.入门介绍](./springcloud/1.入门介绍.md)
+- [temp](./springcloud/temp.md)
 
 
 
