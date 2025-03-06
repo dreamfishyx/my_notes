@@ -973,3 +973,79 @@ class Solution:
 ```
 
 看了下官方题解，说这就叫贪心，我都没往贪心那儿想。emmm……难道说贪心是人的本能？不要啊大锅，俺想做个好人！！！<br><img src="./assets/image-20250305085721817.gif" alt="image-20250305085721817" style="zoom:66%;" />
+
+
+
+
+
+
+
+##### 3.6
+
+[2588. 统计美丽子数组数目](https://leetcode.cn/problems/count-the-number-of-beautiful-subarrays)
+
+今天的题，怎么说呢，看懂了就会发现，这不是消消乐嘛！所谓选两个数减去${2^k}$,其实就是$k+1$位上两个 1 抵消了，通过异或操作很容易满足的。所谓美丽子数组，其实子数组内所有元素各个二进制位上的 1 两两一抵消，最后结果为 0 (所有元素异或即可)。<br><img src="./assets/image-20250306102003829.png" alt="image-20250306102003829" style="zoom:66%;" />
+
+ 就是于是给出以下代码，但是不幸的是，<font color=red>内存超出限制</font>！！！
+
+```python
+class Solution:
+    def beautifulSubarrays(self, nums: List[int]) -> int:
+        res = 0
+        dp = [[0]*len(nums) for _ in range(len(nums))]
+        for i in range(len(nums)):
+            for j in range(i, len(nums)):
+                if j ==i:
+                    dp[i][j] = nums[j]
+                else:
+                    dp[i][j] = dp[i][j-1] ^ nums[j]
+                res += 1 if dp[i][j] ==0 else 0
+        return res
+```
+
+没事内存大了应该是 dp 数组的原因，稍微想一想，异或一个数两次等于没异或，而且异或运算具有交换性，于是只需要一个数组记录上一轮。后续只需要再异或一遍某个元素，消除影响即可。但第一轮需要手动处理一遍，嗯……代码感觉很不优雅！！！并且，<font color=red>这代码它超时了！！！</font>
+
+```python
+class Solution:
+    def beautifulSubarrays(self, nums: List[int]) -> int:
+        res = 0
+        # dp[j] 表示上一轮次到j的异或值
+        dp = [0] * len(nums)
+        
+        dp[0] = nums[0]
+        res += 1 if dp[0] == 0 else 0
+
+        for i in range(1,len(nums)): # 第一轮处理
+            dp[i] = dp[i-1] ^ nums[i]
+            res += 1 if dp[i] == 0 else 0
+
+        for i in range(1,len(nums)):
+            for j in range(i, len(nums)):
+               # 取消上一轮的首位异或值
+               dp[j] = dp[j] ^ nums[i-1]
+               res += 1 if dp[j] == 0 else 0
+        return res
+```
+
+能想到撤销前面一个的影响，为啥就想不到撤销前面一群呢？！我真傻,真的，我单想到可以…没想到…
+
+```python
+from collections import defaultdict
+from typing import List
+
+class Solution:
+    def beautifulSubarrays(self, nums: List[int]) -> int:
+        res = 0
+        prefix_count = defaultdict(int)
+        # 初始认为异或结果为0的个数为1,这样后续异或结果为0的时候，可以直接加上这个个数
+        prefix_count[0] = 1 
+        curr_xor = 0
+        for num in nums:
+            curr_xor ^=num
+            #curr_xor异或一些数结果仍为curr_xor，说明这些数异或结果为0(即得到一个美丽子数组)
+            res += prefix_count[curr_xor]
+            prefix_count[curr_xor] += 1
+        return res
+```
+
+吐了，昨晚睡觉之前没忍住看了一眼今天的每日一题，稍微一看，我去这不稳了嘛。emmm……结果确实稳了，躺的稳稳地！！！<br><img src="./assets/image-20250306101306954.png" alt="image-20250306101306954" style="zoom:67%;" /><br><img src="./assets/image-20250306101057946.png" alt="image-20250306101057946" style="zoom:75%;" />
