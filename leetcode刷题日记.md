@@ -1049,3 +1049,99 @@ class Solution:
 ```
 
 吐了，昨晚睡觉之前没忍住看了一眼今天的每日一题，稍微一看，我去这不稳了嘛。emmm……结果确实稳了，躺的稳稳地！！！也算是集齐了力扣常见提交结果了！！！<br><img src="./assets/image-20250306101306954.png" alt="image-20250306101306954" style="zoom:67%;" /><br><img src="./assets/image-20250306101057946.png" alt="image-20250306101057946" style="zoom:75%;" />
+
+
+
+
+
+
+
+
+
+##### 3.7
+
+[2597. 美丽子集的数目](https://leetcode.cn/problems/the-number-of-beautiful-subsets)
+
+本来想的是，使用一个字典存储各个数字出现的频率，然后使用排列组合的方式计算，但是实际编写代码的时候发现不太好处理：我似乎需要判断i-k,i+k存在与否，并依次计算组合方式，关键是如何保证不重复计算(当然实际上后面看到官方解法得到启发，排序，然后每次只处理前面的，后面的不管，但是这样计算排列组合也是很麻烦的，依旧存在重复，a 和 b 的组合方式，会影响到 b 和 c 的选取组合)？花了很长时间，最后废弃了！！！<br><img src="./assets/image-20250307105629511.png" alt="image-20250307105629511" style="zoom:80%;" />
+
+但是经过排列组合的分析，我有一个新的想法。对于选择问题而言，无非就是选和不选两个选择，使用 dfs + 回溯还是很好解决的，唯一需要注意的是数字可以是重复的，处理逻辑上可能就需要发生一些变化,最终成品代码如下:
+
+```python
+from collections import defaultdict
+from typing import List
+
+class Solution:
+    def beautifulSubsets(self, nums: List[int], k: int) -> int:
+        self.res = 0
+        self.nums = nums
+        self.k = k
+        self.len = len(nums)
+        visited = defaultdict(bool) # 默认为False
+        self.dfs(0, visited)
+        # 去掉空集
+        return self.res - 1
+
+    def dfs(self, start: int, visited: defaultdict) -> None:
+        if start == self.len:
+            self.res += 1
+            return
+            
+        # 不选择当前数字
+        self.dfs(start + 1, visited)
+        
+        # 判断是否可以选择当前数字
+        curr = self.nums[start]
+        if not visited[curr - self.k] and not visited[curr + self.k]:
+            # 判断以前是否选择过相同的数字
+            if not visited[curr]: 
+                # 选择当前数字
+                visited[curr] = True
+                self.dfs(start + 1, visited)
+                # 回溯，撤销选择()
+                visited[curr] = False
+            else:
+                # 选择当前数字
+                self.dfs(start + 1, visited)
+```
+
+> 在回溯的时候，脑子没反应过来，就一直觉得后面没有执行代码，回不回溯没啥影响。但是 python 参数传递的是引用，虽然影响不了后面，但是回影响前面(在此次选择之前的选择)，:expressionless:。
+
+依照习俗，感受一下来自算法之神——力扣官方的威压，第一个解法回溯没问题，第二个解法…oh…tomato，啊不是，动态规划。**考虑将每个数根据模 k 的结果进行分组，如果模 k 不同余，那么它们一定不相差 k**。其实大致解释一下官解思路，就是对元素计数之后，按照 k 取模进行分组，这样就可以将相差 k 的若干倍的元素分到一组，此时相差 k 的元素必然在同一组，此时我们再对分组进行排序，那么相差 k 的元素必然在分组中相邻，此时我们只需要对相邻元素进行分析。而最后结果就是所有分组取法的乘积。
+
+```python
+from collections import defaultdict
+from typing import List
+
+class Solution:
+    def beautifulSubsets(self, nums: List[int], k: int) -> int:
+        group = defaultdict(dict)
+        for num in nums:
+            # 将元素计数，按照num % k分组
+            # 每个分组中元素之间的差值为k的倍数
+            group[num % k][num] = group[num % k].get(num, 0) + 1
+
+        ans = 1
+
+        for g in group.values():
+            sorted_g = sorted(g.keys()) # 组内按照元素大小排序
+            l = len(sorted_g)
+            # i表示元素在sorted_g的位置，j表示是否选取，f[i][j]当前方案数
+            f = [[0]*2 for _ in range(l)]
+            f[0][0] = 1
+            f[0][1] = (1 << g[sorted_g[0]]) - 1
+            for i in range(1,l):
+                # 当前元素不选取，前面一个元素随意选取
+                f[i][0] = f[i-1][0] + f[i-1][1]
+                # 首先我们需要知道，当前元素存在 g[sorted_g[i]] 个
+                # 至少选一个就是2 ** g[sorted_g[i]] - 1种选择
+                if sorted_g[i] - sorted_g[i-1] == k:
+                    # 此时，前一个元素不能选
+                    f[i][1] = f[i-1][0] * ((1 << g[sorted_g[i]]) - 1)
+                else:
+                    # 前面一个元素随意选取
+                    f[i][1] = (f[i-1][0] + f[i-1][1])* ((1 << g[sorted_g[i]]) - 1)
+            ans *= f[l-1][0] + f[l-1][1] # 选取和不选取的方案数相加
+        return ans - 1 # 不选取空集
+```
+
+> 在Python中，位移运算符 `<<` 的优先级低于减法运算符 `-`。
