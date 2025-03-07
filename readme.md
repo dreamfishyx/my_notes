@@ -201,9 +201,7 @@
 - [1.js入门](./vue/1.js入门.md)
 - [10.路由](./vue/10.路由.md)
 - [11.vue3](./vue/11.vue3.md)
-- [12.TypeScript入门](./vue/12.TypeScript入门.md)
-- [13.TypeScript快速上手](./vue/13.TypeScript快速上手.md)
-- [14.vue3补充](./vue/14.vue3补充.md)
+- [12.vue3(2)](./vue/12.vue3(2).md)
 - [2.vue2初识](./vue/2.vue2初识.md)
 - [3.vue核心技术(1)](./vue/3.vue核心技术(1).md)
 - [4.vue核心技术(2)](./vue/4.vue核心技术(2).md)
@@ -212,6 +210,11 @@
 - [7.自定义事件](./vue/7.自定义事件.md)
 - [8.ajax](./vue/8.ajax.md)
 - [9.vuex](./vue/9.vuex.md)
+- [A.TypeScript入门](./vue/A.TypeScript入门.md)
+- [B.TypeScript快速上手](./vue/B.TypeScript快速上手.md)
+- [C.vue3初试](./vue/C.vue3初试.md)
+- [C.vue3补充](./vue/C.vue3补充.md)
+- [vue3(2)](./vue/vue3(2).md)
 
 
 

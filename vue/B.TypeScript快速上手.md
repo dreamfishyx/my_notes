@@ -697,3 +697,26 @@
    ```
 
    
+
+
+
+
+
+##### 导入和导出
+
+```ts
+// 导出类型 (types.ts)
+interface Product {
+    id: string
+    price: number
+}
+a = 5
+export { Product,a }
+
+// 导入类型 (app.ts)
+import type { type Product } from './types'
+
+// 同时导入值和类型
+import { type Product, a } from './types'
+```
+

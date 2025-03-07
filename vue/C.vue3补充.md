@@ -144,8 +144,6 @@
    });
    ```
 
-   
-
 2. 使用 `Vue CLI` 创建项目，你将不会有 `vite.config.js` 文件，而是会有 `vue.config.js` 文件来进行配置。
 
    

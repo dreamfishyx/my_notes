@@ -6,7 +6,7 @@
 
 ##### 2.25
 
-[189.轮转数组](https://leetcode.cn/problems/rotate-array/)
+[189.轮转数组](https://leetcode.cn/problems/rotate-array/)(非每日一题)
 
 > - 考虑特殊情况，k大于arr.length时，需要忽略完整圈数
 > - 对于 python 切片，很容易就实现 `nums[:] = nums[num - k:] + nums[:num - k] `，这一解法演变出最后面的结题方式。
