@@ -1145,3 +1145,130 @@ class Solution:
 ```
 
 > 在Python中，位移运算符 `<<` 的优先级低于减法运算符 `-`。
+
+
+
+
+
+
+
+##### 3.8
+
+[2234. 花园的最大总美丽值](https://leetcode.cn/problems/maximum-total-beauty-of-the-gardens)
+
+~~摆烂一天，待补！！！~~首先找最接近种满的花园把它种满，找花数最少的花园以提高最小值，这肯定是没问题的。但是最初的时候我尝试贪心，我比较把花园种满和提高最小值这两种方式的性价比，我选取最高的那种方式，最后直至无法种植。但是这种方式存在很明显的误区，就是我可能导致后一种方式无法执行，例如原本我可以两次提高最小值，但是由于前一次选择把花园种满的性价比高于提高一次最小值，于是选择种满花园，但是结果导致后面可种植花数不够，但是可能实际两次提高最小值要优于一次种满花园。其实本质上就是性价的代价比难以判断，对于种满花园而言，其代价并不止当前种满改花园所需花数，还包括后面因为该选择浪费的花数，提升最小值的方式同理。
+
+实际上，上面的思路困住我许久…
+
+当然最后还是参照官解思路，其实很简单，种满花园的时候找花数最多的，我们遍历种满若干花园的方式，然后尽可能提高最小值，最后取最大的结果。对于可以填满所有花园的情况，感觉可以直接返回,没必要继续判断:
+
+```python
+from typing import List
+
+class Solution:
+    def maximumBeauty(self, flowers: List[int], newFlowers: int, target: int, full: int, partial: int) -> int:
+        n = len(flowers)
+        # 降序排列各个花园的美丽值，超过target的部分全部变为target
+        flowers = sorted([min(x, target) for x in flowers], reverse=True)
+        total = sum(flowers)
+        ans = 0
+
+        # 如果newFlowers足够填满所有花园，那么就初始化为full * n
+        # 其实这里是对下面的循环进行了补充,下面循环其实并没有考虑到newFlowers填满所有n个花园的情况(i<n)
+        if target * n - total <= newFlowers:
+            # ans = full * n
+            return max(full * n,full * (n - 1) + partial * (target - 1)) if target * n-total != 0 else full * n
+        
+        pre = ptr = 0
+        for i in range(n):
+            if i != 0:
+                pre += flowers[i - 1]
+            if flowers[i] == target:
+                continue
+            # 将前面i个花园([0,i-1])中种满花朵，剩余的花朵数为rest
+            rest = newFlowers - (target * i - pre)
+            if rest < 0:
+                break
+            # 不妨记ptr为j
+            # 找到最小的j(其实就是找最大的flowers[j]，从而使最小值尽可能大)，使得flowers[j] * (n - j) - total <= rest
+            while not (ptr >= i and flowers[ptr] * (n - ptr) - total <= rest):
+                total -= flowers[ptr]
+                ptr += 1
+            
+            rest -= flowers[ptr] * (n - ptr) - total
+            #  尝试将剩余的rest分配给flowers[ptr]，flowers[ptr + 1]...flowers[i]
+            #  同时要避免超过target
+            ans = max(ans, full * i + partial * (min(flowers[ptr] + rest // (n - ptr), target - 1)))
+    
+        return ans
+```
+
+其实我感觉，我似乎对遍历这种方式存在“偏见”，对于遍历这种方式，我无法通过一种很确切的方式取解释它，它对于我而言似乎只有最后的执行结果是确定的(不知道该如何描述这种感觉)。因此对于一个问题，我总是尝试去贪心、去动态规划、去使用数学方法等等，而对应遍历、模拟这种最好理解的方式最容易忽视。
+
+
+
+
+
+
+
+##### 3.9
+
+[2070. 每一个查询的最大美丽值](https://leetcode.cn/problems/most-beautiful-item-for-each-query)
+
+比昨天的题要简单些，无非就是排序，就前面最大美丽值，然后查找。写完这道题，关于二分查找这部分的理解加深了很多，发现之前学数据结构的时候，自己写的一些代码实现存在很多的问题(主要还是死循环问题)。给出如下代码:
+
+```python
+from typing import List
+
+class Solution:
+    def maximumBeauty(self, items: List[List[int]], queries: List[int]) -> List[int]:
+        # 从小到大排序
+        items = sorted(items, key=lambda x: x[0])
+
+        # 计算前缀和
+        n = len(items)
+        max_beauty = 0
+        max_list = [0] * n
+        for i in range(n):
+            max_beauty = max(max_beauty, items[i][1])
+            max_list[i] = max_beauty
+        
+
+        # 二分查找，返回最后一个小于等于target的位置
+        def binary_search(left, right, target):
+            while left < right:
+                mid = left + (right - left) // 2
+                if items[mid][0] <= target: 
+                    left = mid + 1
+                else:
+                    right = mid
+            return left  if items[left][0] <= target else left - 1
+
+        # 二分查找
+        ans = []
+        left = 0
+        right = n - 1
+        pre_ans = -1
+        for i in range(len(queries)):
+            # 二分查找
+            if pre_ans == -1: # 无法使用前一次的结果
+                idx = binary_search(left, right, queries[i])
+            else:
+                # 感觉等于的可能性不大，就不单独处理了
+                if queries[i] <= queries[i-1]:
+                    idx = binary_search(left, pre_ans, queries[i])
+                else:
+                    idx = binary_search(pre_ans, right, queries[i])
+                
+            # 保存前一次的位置和结果
+            if idx >= 0:
+                pre_ans = idx
+                ans.append(max_list[idx])
+            else:
+                pre_ans = -1
+                ans.append(0)
+
+        return ans
+```
+
+实际上还是有点不服气，我在二分查找的时候想到，是否可以根据前一次的结果缩短下一次查找的区间，我也确实这样做了，测试结果也是过来，但是实际时间消耗比不优化的时候明显增大了，开摆！！！<br><img src="./assets/image-20250309143205619.png" alt="image-20250309143205619" style="zoom:80%;" />
