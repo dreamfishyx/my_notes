@@ -1225,7 +1225,7 @@ class Solution:
         # 从小到大排序
         items = sorted(items, key=lambda x: x[0])
 
-        # 计算前缀和
+        # 计算前缀
         n = len(items)
         max_beauty = 0
         max_list = [0] * n
@@ -1244,13 +1244,12 @@ class Solution:
                     right = mid
             return left  if items[left][0] <= target else left - 1
 
-        # 二分查找
+        # 二分查找获取结果
         ans = []
         left = 0
         right = n - 1
         pre_ans = -1
         for i in range(len(queries)):
-            # 二分查找
             if pre_ans == -1: # 无法使用前一次的结果
                 idx = binary_search(left, right, queries[i])
             else:
@@ -1272,3 +1271,41 @@ class Solution:
 ```
 
 实际上还是有点不服气，我在二分查找的时候想到，是否可以根据前一次的结果缩短下一次查找的区间，我也确实这样做了，测试结果也是过来，但是实际时间消耗比不优化的时候明显增大了，开摆！！！<br><img src="./assets/image-20250309143205619.png" alt="image-20250309143205619" style="zoom:80%;" />
+
+
+
+
+
+
+
+##### 3.10
+
+[2269. 找到一个数字的 K 美丽值](https://leetcode.cn/problems/find-the-k-beauty-of-a-number)
+
+简简单单一道滑动窗口题,然后就是简单的获取一个整数的高位和低位的问题，结果如下:
+
+```python
+class Solution:
+    def divisorSubstrings(self, num: int, k: int) -> int:
+        n = len(str(num))
+        num_bak = num
+        if n < k:
+            return 0
+        ans = 0
+        s = 0 # 记录当前的数字
+        low = 0
+        for high in range(n):
+            s = s * 10 + num // (10 ** (n - high - 1)) # 设置s的低位
+            if high >= k - 1:
+                s %= 10 ** k # 删除s高位
+                if  s!= 0 and num_bak % s == 0:
+                    ans += 1
+                low += 1
+            num %= 10 ** (n - high - 1) # 删除num高位
+            
+        
+        return ans
+    
+```
+
+看了一下官方的题解，大差不差，枚举然后截取转整形。
