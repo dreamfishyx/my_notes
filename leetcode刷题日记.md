@@ -1309,3 +1309,112 @@ class Solution:
 ```
 
 看了一下官方的题解，大差不差，枚举然后截取转整形。
+
+
+
+
+
+
+
+##### 3.11
+
+[2012. 数组美丽值求和](https://leetcode.cn/problems/sum-of-beauty-in-the-array)
+
+依旧是比较简单的一道题，遍历一次循环，维护前缀最大值和后缀最小值，第二遍循环计算美丽值的和，代码如下:
+
+```python
+from typing import List
+
+
+class Solution:
+    def sumOfBeauties(self, nums: List[int]) -> int:
+        n = len(nums)
+        left_max = [0] * n
+        right_min = [0] * n
+        left_max[0] = nums[0]
+        right_min[n - 1] = nums[n - 1]
+        for i in range(1, n - 1):
+            left_max[i] = max(nums[i], left_max[i - 1]) # 计算左边的最大值
+            right_min[n - i - 1] = min(nums[n - i - 1], right_min[n - i]) # 计算右边的最小值
+
+        ans = 0
+        for i in range(1, n - 1):
+            if left_max[i - 1] < nums[i] < right_min[i + 1]:
+                ans += 2
+            elif nums[i - 1] < nums[i] < nums[i + 1]:
+                ans += 1
+        
+        return ans
+```
+
+
+
+
+
+
+
+##### 3.12
+
+[3305. 元音辅音字符串计数 I](https://leetcode.cn/problems/count-of-substrings-containing-every-vowel-and-k-consonants-i)
+
+简简单单遍个历，代码如下:
+
+```python
+class Solution:
+    def countOfSubstrings(self, word: str, k: int) -> int:
+        vowels = 'aeiou'
+        n = len(word)
+        ans = 0
+        for i in range(n):
+            set_vowels = set() # 元音字母的集合
+            cnt = 0  # 辅音字母的个数
+            for j in range(i, n):
+                if word[j] in vowels:
+                    set_vowels.add(word[j])
+                else:
+                    cnt += 1 
+
+                if len(set_vowels) == 5 and cnt == k:
+                    ans += 1
+                elif cnt > k:
+                    break
+        return ans
+```
+
+老习俗，学习方法结题思路，不出意外后续几天可能都是这个元音辅音字符串计数了。令 count(k) 表示每个元音字母<font color=red>至少</font>出现一次，并且至少包含 k 个辅音字母的子字符串的总数，那么本问题的答案等于 count(k)−count(k+1)。对于 count(k)，我们可以使用滑动窗口来求解。
+
+```python
+class Solution:
+    def countOfSubstrings(self, word: str, k: int) -> int:
+        t = "aeiou"
+
+        def count(m: int) -> int:
+            n = len(word)
+            ans, j, cnt = 0, 0, 0
+            occur = {}
+            # [i, j)
+            for i in range(n):
+                # 扩展j
+                while j < n and (cnt < m or len(occur) < 5):
+                    if word[j] in t:
+                        occur[word[j]] = occur.get(word[j], 0) + 1
+                    else:
+                        cnt += 1
+                    j += 1
+
+                if cnt >= m and len(occur) == 5:
+                    ans += n - j + 1 # 以i开头的符合要求子串的个数
+
+                if word[i] in t: # 移动i，并消除之前的影响
+                    occur[word[i]] -= 1
+                    if occur[word[i]] == 0:
+                        del occur[word[i]]
+                else:
+                    cnt -= 1
+
+            return ans
+
+        return count(k) - count(k + 1)   
+```
+
+有点难想，还是得多练!!!
