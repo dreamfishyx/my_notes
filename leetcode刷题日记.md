@@ -1418,3 +1418,76 @@ class Solution:
 ```
 
 有点难想，还是得多练!!!
+
+
+
+
+
+
+
+##### 3.13
+
+[3306. 元音辅音字符串计数 II](https://leetcode.cn/problems/count-of-substrings-containing-every-vowel-and-k-consonants-ii)
+
+其实就是昨天的题，但是时间要求更高了点，只能使用滑动窗口了，代码如下:
+
+```python
+class Solution:
+    def countOfSubstrings(self, word: str, k: int) -> int:
+        t = "aeiou"
+
+        def count(m: int) -> int:
+            cnt = 0 # 记录辅音字母的个数
+            n = len(word)
+            ans, j = 0, 0
+            occur = {} # 记录元音字母的出现次数
+            # [i, j)
+            for i in range(n):
+                # 扩展j
+                while j < n and (cnt < m or len(occur) < 5):
+                    if word[j] in t:
+                        occur[word[j]] = occur.get(word[j], 0) + 1
+                    else:
+                        cnt += 1
+                    j += 1
+                
+                if cnt >= m and len(occur) == 5:
+                    ans += n - j + 1 # 以i开头的符合要求子串的个数
+                
+                if word[i] in t: # 移动i，并消除之前的影响
+                    occur[word[i]] -= 1
+                    if occur[word[i]] == 0:
+                        del occur[word[i]]
+                else:
+                    cnt -= 1
+
+            return ans
+        
+        return count(k) - count(k + 1)
+```
+
+今天的题和昨天的一样，就是测试条件复杂了一点，完全就是昨天的官解在写一遍。emmm…再找一道贪心的题写写，但是这道题似乎几年前写过(心血来潮刷了一段时间):[11. 盛最多水的容器](https://leetcode.cn/problems/container-with-most-water/),很简单的一道题(可能是因为做过，下意识的)。从两边遍历容器内壁的高度，然后选取高度低的那一侧替换(若是相同则均替换)。至于为啥是这样的替换规则，两边向中间遍历的话，容器宽度一定会减少，只有高度增加才可能导致容积变大。代码如下:
+
+```python
+class Solution:
+    def maxArea(self, height: List[int]) -> int:
+        i = 0
+        j = len(height) - 1
+        volume = 0
+        while i < j:
+            volume = max(volume, min(height[i], height[j]) * (j - i))
+            # 移动较短的那一边,一样的话都移动
+            if height[i] < height[j]: #
+                i += 1
+            elif height[i] > height[j]:
+                j -= 1
+            else:
+                i += 1
+                j -= 1
+        return volume
+```
+
+
+
+
+
