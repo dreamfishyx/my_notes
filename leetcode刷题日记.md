@@ -1487,7 +1487,37 @@ class Solution:
         return volume
 ```
 
+若是真的存在命运，我想如今的我也会坦然拥抱它吧。虽然偶尔可能心血来潮妄想反抗一下，中二地说一句我命由我;就像一条窒息的鱼，偶尔挣扎反抗一下，然后陷入长久地沉默之中。但可惜的是:命运存在于过去、存在于未来，确从不曾出现在现在！
 
 
 
+
+
+
+
+##### 3.14
+
+[3340. 检查平衡字符串](https://leetcode.cn/problems/check-balanced-string)
+
+比较简单的一道题，没有必要计算奇数和偶数位的和然后比较，直接一加一减，判断是否为 0 即可:
+
+```python
+class Solution:
+    def isBalanced(self, num: str) -> bool:
+        res = 0
+        for i in range(len(num)):
+            # 偶数位加，奇数位减
+            res += int(num[i]) if i % 2 == 0 else -int(num[i])
+        return res == 0
+```
+
+看了一下官方解法，使用变量 sign (初始为 1 ) 作为符号，每次乘以 -1 即可实现切换，还是很妙的！！！
+
+
+
+
+
+
+
+##### 3.15
 
