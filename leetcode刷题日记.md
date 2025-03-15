@@ -1487,7 +1487,9 @@ class Solution:
         return volume
 ```
 
-若是真的存在命运，我想如今的我也会坦然拥抱它吧。虽然偶尔可能心血来潮妄想反抗一下，中二地说一句我命由我;就像一条窒息的鱼，偶尔挣扎反抗一下，然后陷入长久地沉默之中。但可惜的是:命运存在于过去、存在于未来，确从不曾出现在现在！
+
+
+若是真的存在命运，我想如今的我也会坦然拥抱它吧。虽然偶尔可能心血来潮妄想反抗一下，中二地喊一句我命由我;就像一条窒息的鱼一样，偶尔挣扎反抗一下，然后陷入长久地沉默之中。但可惜的是，命运存在于过去、存在于未来，却从不曾出现在现在！
 
 
 
@@ -1520,4 +1522,35 @@ class Solution:
 
 
 ##### 3.15
+
+[3110. 字符串的分数](https://leetcode.cn/problems/score-of-a-string)
+
+今天依旧是比较简单的一道题，代码如下:
+
+```python
+class Solution:
+    def scoreOfString(self, s: str) -> int:
+        ans = 0
+        for i in range(1,len(s)):
+            ans += abs(ord(s[i]) - ord(s[i-1]))
+        return ans
+```
+
+每日一题比较简单，找一道贪心题做一做，这道题也是很久之前做过一次:[55. 跳跃游戏](https://leetcode.cn/problems/jump-game/)。当能跳到某一个位置时，其前面的位置我们也一定可以到达。故只需要遍历，记录最远可以到达的位置即可。
+
+```python
+from typing import List
+
+class Solution:
+    def canJump(self, nums: List[int]) -> bool:
+        max_pos = 0
+        for i, num in enumerate(nums):
+            if i > max_pos: # 当前位置已经超过了最大位置
+                return False
+            max_pos = max(max_pos, i + num) # 更新最远能到达的位置
+    
+        return True
+```
+
+
 
