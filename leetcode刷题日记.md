@@ -1554,3 +1554,166 @@ class Solution:
 
 
 
+
+
+
+
+##### 3.16
+
+[2272. 最大波动的子字符串](https://leetcode.cn/problems/substring-with-largest-variance/)
+
+前几天全是简单题，周末放大招？？对于长度小于等于 2 的无需处理，直接返回 0 ，其他情况遍历,不用想也知道回超时！！！
+
+```python
+class Solution:
+    def largestVariance(self, s: str) -> int:
+        n = len(s)
+        if n <= 2: return 0
+
+        max_diff = 0
+        self.max_char, self.min_char = "", ""
+
+        for i in range(n - 1):
+            self.max_char, self.min_char = s[i], s[i]
+            map = {}
+            for j in range(i, n):
+                # 统计字符出现次数
+                map[s[j]] = map.get(s[j], 0) + 1
+                if len(map) == 1: continue
+                # 更新min、max
+                self.updateMap(map)
+                # 更新最大波动
+                max_diff = max(max_diff, map[self.max_char] - map[self.min_char])
+        return max_diff
+    
+    def updateMap(self, map:dict):
+        for k in map.keys():
+            if map[k] > map[self.max_char]:
+                self.max_char = k
+            if map[k] < map[self.min_char]:
+                self.min_char = k
+```
+
+投降，看官解！！！每个子字符串的的波动值只取决于最多和最少的字符(由于全是小写字符，组合情况是有限的)，对此我们可以遍历这些字符串的情况。那么接下来的情况就只需要集中注意到这两个字符上，我们记录最多的字符(假设为a)为1，最少(假设为b)的为-1(由于组合情况已经包含谁多谁少的情况，无需考虑)。那么最后的问题来了，一个子字符串的波动值等于其元素之和，从而进一步成为一个动态规划问题！！！但是若是只存在a、或者b的情况下，波动值是不予计算的，当然若是只存在b，此时波动值为负数无需考虑。
+
+```python
+class Solution:
+    def largestVariance(self, s: str) -> int:
+        n = len(s)
+        chars = set(s) # 获取字符串中的字符集合
+        ans = 0
+        for a in chars:
+            for b in chars:
+                if a == b: continue 
+                i = 0
+                f0 = 0 # 以i结尾的最大子数组和(不一定含有 b)
+                f1 = float('-inf') # 以i结尾的含有 b 的最大子数组和(一定含有 b)
+
+                while i < n:
+                    if s[i] == a:
+                        f0, f1 = max(f0,0) + 1, f1 + 1
+                    elif s[i] == b:
+                        f0, f1 = max(f0, 0) - 1, max(f1,f0,0) - 1
+                    # else: continue
+                    ans = max(ans, f1)
+                    i += 1
+        return ans
+```
+
+为啥 f1 要初始化为 `float('-inf')` ? f1 一定要包含 b ，若是初始化为任意负数，若是遇到 a 可能会导致 f1 变为正数，此时是不合法的(这时 f1 不应该存在值)。或者可以理解为`-inf` 是一种标志值，表示当前值不存在或者不合法。
+
+当然其实官解更妙些，没有遍历字符串，而是使用字典记录各个字符的位置，后续就没必要全部遍历！！！
+
+
+
+
+
+
+
+##### 3.17
+
+[1963. 使字符串平衡的最小交换次数](https://leetcode.cn/problems/minimum-number-of-swaps-to-make-the-string-balanced)
+
+其实上述题目看起来挺吓人的，最初的时候以为可以使用递归判断，但是这不是一个判断题，递归不太方便。其实仔细理解题目，大致可以知道最基础的平衡字符串有三种:`""、[]、[][]`，其他都是在此基础之上进行嵌套。到这里其实问题就明朗了，就是个括号匹配问题。下面给出最初的代码，<font color=red>但是实际上这个代码是错误的！！！</font>
+
+```python
+class Solution:
+    def minSwaps(self, s: str) -> int:
+        right_size = 0 # 未匹配的右括号数量
+        need_swap = 0 # 需要交换的次数
+        for c in s:
+            if c == '[':  
+                # 遇到左括号，未匹配的右括号数量加1
+                right_size += 1
+            else:
+                # 遇到右括号，未匹配的右括号数量减1
+                if right_size > 0:
+                    right_size -= 1
+                else:
+                    # 未匹配的右括号数量为0，需要交换
+                    need_swap += 1
+        return need_swap
+```
+
+在上述代码中，我们遇到无法匹配的右括号就认为需要交换，这没有问题。但是交换后实际上会导致后面的某个`[`变为`]`，并且当前`]`变为`[`。但是这点我们并没有体现。更改代码如下:
+
+```python
+class Solution:
+    def minSwaps(self, s: str) -> int:
+        right_size = 0 # 未匹配的右括号数量
+        need_swap = 0 # 需要交换的次数
+        for c in s:
+            if c == '[':  
+                # 遇到左括号，未匹配的右括号数量加1
+                right_size += 1
+            else:
+                # 遇到右括号，未匹配的右括号数量减1
+                if right_size > 0:
+                    right_size -= 1
+                else:
+                    # 未匹配的右括号数量为0，需要交换
+                    need_swap += 1
+        # 没有实际交换，导致后续不匹配情况翻倍
+        return (need_swap + 1) >> 1
+```
+
+```python
+class Solution:
+    def minSwaps(self, s: str) -> int:
+        right_size = 0 # 未匹配的右括号数量
+        need_swap = 0 # 需要交换的次数
+        for c in s:
+            if c == '[':  
+                # 遇到左括号，未匹配的右括号数量加1
+                right_size += 1
+            else:
+                # 遇到右括号，未匹配的右括号数量减1
+                if right_size > 0:
+                    right_size -= 1
+                else:
+                    # 未匹配的右括号数量为0，需要交换
+                    need_swap += 1
+                    # 将当前 ] 换为 [
+                    right_size +=1
+        return need_swap
+```
+
+```python
+class Solution:
+    def minSwaps(self, s: str) -> int:
+        right_size = 0 # 未匹配的右括号数量
+        for c in s:
+            if c == '[':  
+                # 遇到左括号，未匹配的右括号数量加1
+                right_size += 1
+            else:
+                # 遇到右括号，未匹配的右括号数量减1
+                if right_size > 0:
+                    right_size -= 1
+        # 多余的右括号数其实就是 need_swap
+        return (right_size + 1) >> 1
+```
+
+其实上交换后实际上会导致后面的某个`[`变为`]`，并且当前`]`变为`[`，但若是没有交换，会导致啥呢？会导致后一个`]`本来在交换后可以匹配却无法匹配(但是这一点对交换最后一个`]`无影响)(这也就是`(need_swap + 1) >> 1`的由来)。此时若是我们在交换时执行`right_size +=1`,自然就消除了该影响。
+
+但是其实还存在一个最重要的问题，那就是为啥这样交换次数是最小的？其实在写代码时并没有仔细想过这个问题，我们每次并没有真正交换，而是在尽可能匹配的前提下交换。不妨考虑这样一个问题，那就是我们只交换`]`为`[`,却并没有改`[`为`]`,是否会影响后续匹配，导致交换后不可以匹配的部分错误的匹配了呢？其实答案很简单，若是导致这种情况，那我们不会换掉这个`[`,这不是最优的！！！在尽可能匹配的前提下交换从而得到最小交换次数！！！
