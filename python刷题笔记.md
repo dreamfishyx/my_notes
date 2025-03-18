@@ -164,6 +164,68 @@
 
 
 
+##### 判断质数
+
+```python
+def isPrime(n):
+    if n <= 2: # 1和2都是素数
+        return False
+    for i in range(2, n): # 判断是否可以被2~n-1整除
+        if n % i == 0:
+            return False
+    return True
+```
+
+```python
+from math import sqrt
+
+def isPrime(n):
+    if n <= 2: 
+        return False
+    for i in range(2, int(sqrt(n)) + 1 ):  # int(num**0.5) + 1
+        if n % i == 0:
+            return False
+    return True
+```
+线性筛选:???
+
+
+
+
+
+##### 公因数、公倍数
+
+```python
+# 最大公约数
+def gcd(a, b):
+    if a < b: # 保证a大于b
+        a, b = b, a
+    while b != 0: # 辗转相除法
+        a, b = b, a % b
+    return a
+```
+
+```python
+def gcd(a, b):
+    if a < b: # 保证a大于b
+        a, b = b, a
+    while b != 0: # 辗转相除法
+        a, b = b, a % b
+    return a
+
+# 最小公倍数
+def lcm(a, b):
+    return a * b // gcd(a, b)
+```
+
+
+
+
+
+
+
+
+
 ##### 贪心
 
 1. 首先，贪心算法是在每一步选择当前看起来最优的解，希望这样能得到全局最优。但问题在于，并不是所有问题都适用，因为局部最优的累积不一定是全局最优。比如背包问题，如果是分数背包的话，贪心是有效的，但如果是0-1背包，贪心可能就不行，因为可能选了某个高价值但重量大的物品，导致后面装不下更多有价值的轻物品。

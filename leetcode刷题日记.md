@@ -1620,7 +1620,7 @@ class Solution:
         return ans
 ```
 
-为啥 f1 要初始化为 `float('-inf')` ? f1 一定要包含 b ，若是初始化为任意负数，若是遇到 a 可能会导致 f1 变为正数，此时是不合法的(这时 f1 不应该存在值)。或者可以理解为`-inf` 是一种标志值，表示当前值不存在或者不合法。
+为啥 f1 要初始化为 `float('-inf')` ? f1 一定要包含 b ，若是初始化为任意负数，若是遇到 a 可能会导致 f1 变为正数，此时是不合法的(这时 f1 不应该存在值)。或者可以理解为`-inf` 是一种标志值，表示当前值不存在或者不合法，只有当其中出现 b 之后标志位才会被清理(很巧妙)！！！
 
 当然其实官解更妙些，没有遍历字符串，而是使用字典记录各个字符的位置，后续就没必要全部遍历！！！
 
@@ -1717,3 +1717,76 @@ class Solution:
 其实上交换后实际上会导致后面的某个`[`变为`]`，并且当前`]`变为`[`，但若是没有交换，会导致啥呢？会导致后一个`]`本来在交换后可以匹配却无法匹配(但是这一点对交换最后一个`]`无影响)(这也就是`(need_swap + 1) >> 1`的由来)。此时若是我们在交换时执行`right_size +=1`,自然就消除了该影响。
 
 但是其实还存在一个最重要的问题，那就是为啥这样交换次数是最小的？其实在写代码时并没有仔细想过这个问题，我们每次并没有真正交换，而是在尽可能匹配的前提下交换。不妨考虑这样一个问题，那就是我们只交换`]`为`[`,却并没有改`[`为`]`,是否会影响后续匹配，导致交换后不可以匹配的部分错误的匹配了呢？其实答案很简单，若是导致这种情况，那我们不会换掉这个`[`,这不是最优的！！！在尽可能匹配的前提下交换从而得到最小交换次数！！！
+
+
+
+
+
+
+
+##### 3.18
+
+[2614. 对角线上的质数](https://leetcode.cn/problems/prime-in-diagonal)
+
+一道很简单的判断质数的题，代码如下:
+
+```python
+from typing import List
+
+
+class Solution:
+    def diagonalPrime(self, nums: List[List[int]]) -> int:
+        n = len(nums)
+        res = 0
+        def is_prime(num: int)-> bool:
+            if num < 2:
+                return False
+            for i in range(2, int(num**0.5) + 1):
+                if num % i == 0:
+                    return False
+            return True
+
+        for i in range(0, n):
+            if is_prime(nums[i][i]) and  nums[i][i] > res:
+                res = nums[i][i]
+            if is_prime(nums[i][n-i-1]) and nums[i][n-i-1] > res:
+                res = nums[i][n-i-1]
+        return res
+```
+
+感觉上述代码的主要时间消耗还是在判断是否为质数上，每次都要遍历完所有的对角线元素才能得到结果。于是想到先对对角线元素降序排序，然后遍历找到第一个质数，此时该质数就是最大的！！！代码如下:
+
+```python
+class Solution:
+    def diagonalPrime(self, nums: List[List[int]]) -> int:
+        # 记录对角线上的数
+        num_list = []
+        n = len(nums)
+        res = 0
+        def is_prime(num: int)-> bool:
+            if num < 2:
+                return False
+            for i in range(2, int(num**0.5) + 1):
+                if num % i == 0:
+                    return False
+            return True
+
+        for i in range(0, n):
+            num_list.append(nums[i][i])
+            if i != n - i - 1:
+                num_list.append(nums[i][n - i - 1])
+
+        # 排序
+        num_list.sort(reverse=True)
+
+        #找第一个质数
+        for i in num_list:
+            if is_prime(i):
+                res = i
+                break
+
+        return res
+```
+
+效果还行！！！<br><img src="./assets/image-20250318130901177.png" alt="image-20250318130901177" style="zoom:75%;" />
+
