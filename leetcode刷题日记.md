@@ -1788,5 +1788,6 @@ class Solution:
         return res
 ```
 
-效果还行！！！<br><img src="./assets/image-20250318130901177.png" alt="image-20250318130901177" style="zoom:75%;" />
+效果还行…<br><img src="./assets/image-20250318130901177.png" alt="image-20250318130901177" style="zoom:75%;" />
 
+看了一下官解评论下一堆人说啥线性筛选法，emmm…看不懂噻！！！<br><img src="./assets/image-20250318133052085.png" alt="image-20250318133052085" style="zoom:67%;" />
