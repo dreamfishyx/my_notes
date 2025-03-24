@@ -1791,3 +1791,548 @@ class Solution:
 效果还行…<br><img src="./assets/image-20250318130901177.png" alt="image-20250318130901177" style="zoom:75%;" />
 
 看了一下官解评论下一堆人说啥线性筛选法，emmm…看不懂噻！！！<br><img src="./assets/image-20250318133052085.png" alt="image-20250318133052085" style="zoom:67%;" />
+
+
+
+
+
+
+
+##### 3.19
+
+[2610. 转换二维数组](https://leetcode.cn/problems/convert-an-array-into-a-2d-array-with-conditions)
+
+比较简单的一道题，可以直接在第一次遍历时记录个元素个数和最大分组数，后续直接填充即可，代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def findMatrix(self, nums: List[int]) -> List[List[int]]:
+        n = len(nums)
+        max_size = 0 # 元素最大出现次数
+        num_map = {} # 记录元素出现次数
+        for i in range(n):
+            num_map[nums[i]] = num_map.get(nums[i], 0) + 1
+            max_size = max(max_size, num_map[nums[i]]) 
+        
+        res = [[] for _ in range(max_size)]
+        for k in num_map.keys():
+            for i in range(num_map[k]):
+                res[i].append(k) # 依次向各分组中填充
+        
+        return res
+```
+
+但是上述方法感觉不够优雅，除了计数能将相同元素聚集到一起外，排序其实也可以做到！！！只不过这时候没法在填充之前搭建起结果列表的结构(不知道最大分组数)，就只好动态拓展，分组不够时新建分组，代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def findMatrix(self, nums: List[int]) -> List[List[int]]:
+        # 排序:使相同的数字相邻
+        nums.sort()
+
+        res = [] # 结果
+        now = 0 # 正在分组的数字(题目说元素大于等于1)
+        group_size = 0 # 当前分组数
+        point = 0 # 正在填充的分组位置
+        
+        for num in nums:
+            if num != now: 
+                # 如果当前数字不等于now,开始为新的数字分组
+                now = num
+                point = 0
+            
+            if point == group_size:
+                # 如果当前分组已经满了,则新建一个分组
+                res.append([num])
+                group_size += 1
+            else:
+                res[point].append(num)
+
+            point += 1
+
+        return res
+```
+
+<br><img src="./assets/image-20250319121011397.png" alt="image-20250319121011397" style="zoom:67%;" />
+
+但是其实这里还是存在一个疑问，那就是对一个含有大量重复元素的列表排序真的好吗？待定…
+
+老规矩看一下官方题解:哈希表计数(Counter)，然后多次循环遍历哈希表，每次将存在余量的元素分成一组，若是元素告罄删除对应键，最终得到所有分组。
+
+```python
+from collections import Counter
+from typing import List
+
+class Solution:
+    def findMatrix(self, nums: List[int]) -> List[List[int]]:
+        cnt = Counter(nums)
+        ans = []
+        
+        while cnt: 
+            arr = []
+            for key in list(cnt.keys()):
+                cnt[key] -= 1
+                arr.append(key)
+                if cnt[key] == 0:
+                    del cnt[key]
+            ans.append(arr)
+        
+        return ans
+```
+
+又学会一个 Counter 用法……<br><img src="./assets/image-20250319123940241.png" alt="image-20250319123940241" style="zoom:67%;" />
+
+
+
+
+
+##### 3.20
+
+[2612. 最少翻转操作数](https://leetcode.cn/problems/minimum-reverse-operations)
+
+其实仔细分析之后，感觉和无向图的最短路径类似，使用 bfs 遍历代码如下，但是很遗憾超时！！！
+
+```python
+from collections import deque
+
+class Solution:
+    def minReverseOperations(self, n: int, p: int, banned: List[int], k: int) -> List[int]:
+        res = [-1] * n
+        res[p] = 0
+
+        banned = set(banned) # 记录已经访问过的位置
+        banned.add(p)
+
+        q = deque()
+        q.append(p)
+
+        while q:
+            cur = q.popleft()
+            # 翻转子数组的左边界取值范围
+            left_min = max(0, cur - k + 1)
+            left_max = min(n - k, cur)
+            for i in range(left_min, left_max + 1):
+                # 计算 cur 翻转后的新位置[根据翻转规则:(i)+(i+k-1)=(p)+(new_pos)]
+                new_pos = 2 * i + k - 1 - cur
+                # 检查新位置是否有效且未被禁止或访问
+                if 0 <= new_pos < n and new_pos not in banned:
+                    res[new_pos] = res[cur] + 1
+                    q.append(new_pos)
+                    banned.add(new_pos)
+        return res
+```
+
+看了一些题解说，由于遍历时访问大量无关元素，导致时间浪费。因此每次判断是否访问太耗时间，可以维护一个未访问集合，避免没有必要的访问。此外可以对集合进行排序，这样我们就可以快速知道一个元素是否在未访问集合中(基于查找的优化)！！！
+
+此外，当我们翻转一个子数组时，位置 `cur` 会变为位置  `2i + k - 1 - cur`，其中 `i` 是子数组的左边界,实际上这个表达式的奇偶性是固定的(至于变量`i`相关)，此时我们可以将查找集合分为奇偶两部分，进而进一步减少查找，其实这也就是官方的第一种解法:
+
+```python
+from typing import List
+from collections import deque
+import sortedcontainers
+
+class Solution:
+    def minReverseOperations(self, n: int, p: int, banned: List[int], k: int) -> List[int]:
+        # 初始化结果数组
+        res = [-1] * n
+        res[p] = 0
+        
+        # 创建两个有序集合，分别存储未访问的奇数和偶数位置
+        not_visited_odd = sortedcontainers.SortedSet()
+        not_visited_even = sortedcontainers.SortedSet()
+        banned_set = set(banned)
+        for i in range(n):
+            if i != p and i not in banned_set:
+                if i % 2 == 1:
+                    not_visited_odd.add(i)
+                else:
+                    not_visited_even.add(i)
+        
+        q = deque([p])
+        
+        while q:
+            cur = q.popleft()
+            
+            # 计算可通过翻转到达的位置范围
+            left_min = max(0, cur - (k - 1))
+            left_max = min(n - k, cur)
+            
+            # 翻转后可能的最小和最大位置
+            min_new_pos = 2 * left_min + k - 1 - cur
+            max_new_pos = 2 * left_max + k - 1 - cur
+            
+            # 根据当前位置的奇偶性选择对应的集合
+            positions = not_visited_odd if min_new_pos % 2 == 1 else not_visited_even
+            
+            # 查找范围内的所有可达位置
+            to_remove = []
+            
+            for idx in positions.irange(min_new_pos, max_new_pos):
+                res[idx] = res[cur] + 1
+                q.append(idx)
+                to_remove.append(idx)
+            
+            # 从未访问集合中移除已访问的位置
+            for pos in to_remove:
+                positions.remove(pos)
+        
+        return res
+```
+
+当然第一种方式理解了，第二种并查集俺的方式其实也就好理解一些，只是将有序集合改为并查集,未遍历集合改为已遍历集合。如果要删除一个元素，可以将它与下一个元素合并，从而在下次访问时跳过已删除的元素(并查集每次查找都返回根节点，非根会被自动忽略，这也是为啥初始化为自己的原因):
+
+```python
+from typing import List
+from collections import deque
+
+class Solution:
+    def minReverseOperations(self, n: int, p: int, banned: List[int], k: int) -> List[int]:
+        # 初始化结果数组
+        res = [-1] * n
+        res[p] = 0
+        
+        # 并查集(初始化为自己),用于记录已访问的位置
+        # 此处需要 n + 2 的原因是，后续删除第 n 个元素时，需要访问第 n + 2 个元素
+        f = [[i for i in range(n + 2)] for _ in range(2)]
+        for i in banned:
+            # 将 i 加入到 i + 2 的集合中,由于 i 不是根节点，后续无法再次访问
+            # 注意由于奇偶的区分，i+1在并查集中属于无效位置！！！
+            self.merge(f[i % 2],i,i + 2)
+        
+        # BFS
+        q = deque()
+        q.append(p)
+        self.merge(f[p % 2],p,p + 2)
+
+        while q:
+            cur = q.popleft()
+            left_min = max(0, cur - k + 1)
+            left_max = min(n - k, cur)
+            pos_min = 2 * left_min + k - cur - 1
+            pos_max = 2 * left_max + k - cur - 1
+
+            j = pos_min
+            while j <= pos_max:
+                # 找到下一个未访问的位置
+                fi = self.find(f[pos_min % 2],j)
+                if  fi > pos_max:
+                    break
+                res[fi] = res[cur] + 1
+                q.append(fi)
+                self.merge(f[pos_min % 2],fi,fi + 2) # 设为已访问(由于fi不是根节点，后续无法再次访问)
+                j = fi + 2
+        return res
+
+    
+    def find(self,f:List[int],target:int)->int:
+        # 路径压缩
+        if f[target] != target:
+            f[target] = self.find(f,f[target])
+        return f[target]
+    
+    def merge(self,f:List[int],a:int,b:int):
+        fa = self.find(f,a)
+        fb = self.find(f,b)
+        if fa != fb:
+            f[fa] = fb
+```
+
+并查集能这么用也是绝了，此外分奇偶优化、大量数据时选用已处理或未处理数组记录从而避免全部遍历的方法都很妙，有点撑了！！！<br><img src="./assets/image-20250323210949078.png" alt="image-20250323210949078" style="zoom:66%;" />
+
+
+
+
+
+
+
+##### 3.21
+
+[2680. 最大或值](https://leetcode.cn/problems/maximum-or/)
+
+其实本质上就是尽可能保证二进制位 1 的数量多，并且位数靠左。对于位移 k 次而言，若是存在一个元素的最高位比其他元素高一位，此时 k 次全部给它无疑是最优解(直接导致结果翻倍，二进制前一位表示值是后一位的 2 倍)；而对于多个并列长度(二进制) ，当选择一个数位移后，就会导致上一种情况；故而 k 次位移必然作用在一个元素上。
+
+在给出最终代码之前，记录一下之前的一个误区，那就是本题的结果不是对最大值进行 k 次位移，因为当存在同一位数的多个元素时，位移最大的元素实际上可能会大致某些位由 1 变 0，此时反而不是最优，如下:
+
+```bash
+1 1 0 1       1 1 0 1 0		     1 1 0 1
+1 0 1 1   --->  1 0 1 1    --->  1 0 1 1
+1 0 0 1			1 0 0 1		   1 0 0 1 0
+			  1 1 0 1 1		   1 1 1 1 1
+```
+
+最终给出代码如下:一次遍历记录后缀或运算的值，第二次遍历记录前缀或运算的值，并维护最大结果。
+
+```python
+from typing import List
+
+class Solution:
+    def maximumOr(self, nums: List[int], k: int) -> int:
+        ans = 0
+        n = len(nums)
+
+        # suffix_or[i] 表示 nums[i] 到 nums[n-1] 的或值
+        suffix_or = [0] * (n+1) 
+        for i in range(n - 1, -1, -1):
+            suffix_or[i] = nums[i] | suffix_or[i+1]
+
+        pre_or = 0
+        for i in range(n):
+            ans = max(ans, pre_or | (nums[i] <<k) | suffix_or[i + 1])
+            pre_or |= nums[i]
+        return ans
+```
+
+而对于官方解法其实也是比较好理解，对于某个元素 a 它参与了或运算和没参加有啥区别？参与或运算，它的 1 位会导致运算结果 or_sum 某些 0 位变 1 。此时若是知道是哪些位置的 0 ，那就可以将 or_sum 复原，消除该元素 a 参与运算的影响(相当于没参与)。这是可能会想，我们假设该元素 a 的所有 1 位都对结果 or_sum 有影响，此时我们只需要将结果与该元素异或运算即可消除。但是实际上这是不合理的，可能 or_sum 原本的某些 1 位( 1 or 1 也为 1 )也会误删，此时我们还需要补救，将这些 1 位补回来(或运算)。最后一个问题，如和找到这些误删的 1 位？由于 or_sum 中该位为 1 ，且会被误删则 a 中该位为 1，则该位 1 至少存在两次才可能被误删(不一定会被删)，此外哪怕没有误删，我们补回来又不会有任何影响，还是 1 。
+
+```python
+from typing import List
+
+class Solution:
+    def maximumOr(self, nums: List[int], k: int) -> int:
+        or_sum = 0
+        twices = 0
+        for num in nums:
+            # 计算出现两次以及以上1的位置
+            twices |=  or_sum & num
+            or_sum |= num
+        
+        return max([(or_sum ^ num) | (num << k) | twices for num in nums])
+```
+
+
+
+
+
+
+
+
+
+##### 3.22
+
+[2643. 一最多的行](https://leetcode.cn/problems/row-with-maximum-ones/)
+
+比较简单的一道题，代码如下:
+
+```python
+from typing import List
+
+
+class Solution:
+    def rowAndMaximumOnes(self, mat: List[List[int]]) -> List[int]:
+        index = 0
+        max_ones = 0
+        for i,arr in enumerate(mat):
+            total = sum(arr)
+            if total > max_ones:
+                max_ones = total
+                index = i
+        return [index, max_ones]
+```
+
+
+
+
+
+
+
+##### 3.23
+
+[2116. 判断一个括号字符串是否有效](https://leetcode.cn/problems/check-if-a-parentheses-string-can-be-valid)
+
+显然又是一个括号匹配问题，最初我参考之前[1963. 使字符串平衡的最小交换次数](https://leetcode.cn/problems/minimum-number-of-swaps-to-make-the-string-balanced)写出如下代码，但是是存在问题的:
+
+```python
+class Solution:
+    def canBeValid(self, s: str, locked: str) -> bool:
+        left_num = 0 # (数量
+        right_available = 0 # 可变为(的)数量
+        for i, c in enumerate(s):
+            if c == '(':
+                left_num += 1
+            if c == ')':
+                if left_num > 0:
+                    left_num -= 1
+                else:
+                    if right_available == 0:
+                        if locked[i] == '1':
+                            return False
+                        else:
+                            left_num += 1
+                    else:
+                        right_available -= 1
+                        left_num += 1
+                        if locked[i] == '0':
+                            right_available += 1
+        return left_num == 0
+```
+
+这道题左右括号数不一定(基本上)不相等，而 1963 经过交换是必然可以匹配的，但是这题不一定。上述代码没有考虑到若是最后剩余`(`该如何处理，于是又得出如下代码，但是很遗憾还是错误的:
+
+```python
+class Solution:
+    def canBeValid(self, s: str, locked: str) -> bool:
+        # 检查长度是否为奇数
+        if len(s) % 2 == 1:
+            return False
+        
+        left_num = 0
+        free = 0
+        for i, c in enumerate(s):
+            if locked[i] == '0':
+                free += 1
+            elif c == '(':
+                left_num += 1
+            else:
+                if left_num > 0:
+                    left_num -= 1
+                else:
+                    if free > 0:
+                        free -= 1
+                    else:
+                        return False
+        # 尝试使用多余的free来匹配左括号
+        return (free - left_num) % 2 == 0 if free >= left_num else False
+```
+
+其实上面最后使用 free 匹配存在很严重的问题，那就是 free 所代表的字符若是在剩余的 left_num 前面呢，如下:你会发现倒数第三个`(`永远不可能被匹配！！！但是上述代码执行的结果却是可以匹配，原因就是`)(`的存在被认为合法了！！！
+
+```bash
+))) (()) (()
+000 1111 111
+```
+
+所以上述处理剩余 left_num 的操作就不合法,emmm…确定这不是困难题吗!？<br><img src="./assets/image-20250324130527111.png" alt="image-20250324130527111" style="zoom:80%;" />
+
+看来只能使用组合拳解题法:不会，开摆，看官解。官方题解的思路，即字符串分数化，那有效括号字符串等效于: 字符串分数为0，且字符串任意前缀的分数大于等于0。那么思路知晓了，如何去实现呢？对于一个锁定的字符，直接就是 `(` 记作 1，`)`记作 -1 即可。但是对于未锁定的字符串，其实存在两种选择，即记作 1 或者   -1,那么其实我们可以遍历所有情况，找到其过程中一直满足大于等于 0 且最终分数为 0 的一个，那么此时就证明存在某种情况可以使得括号字符串有效。
+
+那么不妨继续分析，那就是其过程中要一直满足大于等于 0,需要不断地删除不合法的数据的部分，那么什么是不合法的呢？对于一个`**`我们知道它的最小合法值是`()`也就是0，对于`***`最小合法值为 1 ，也就是`()(`或者`(()`,其他的情况都是不合法的。至于为啥需要立即删除，因为此后`(`的出现可能导致其被误认为合法，例如`())(`对于`())`而言不合法，但是`())(`为 0 被误认为合法，但是`)(`是不被认可的。
+
+不妨具体模拟体会一下，`(***)*`,其中以`*`表示未锁定，其计算过程如下:最终显然存在一种方式导致方案分数为 0 ，使得字符串合法！！！
+
+| 索引 | 字符 | 分数情况           | 备注                   |
+| ---- | ---- | ------------------ | ---------------------- |
+| 0    | `(`  | {1}                | 锁定，+1               |
+| 1    | `*`  | {0,2}              | 各种结果分别考虑+1、-1 |
+| 2    | `*`  | ~~{-1,1,3}~~ {1,3} | -1 不合法              |
+| 3    | `*`  | {0,2,4}            | 各种结果分别考虑+1、-1 |
+| 4    | `)`  | ~~{-1,1,3}~~ {1,3} | -1 不合法              |
+| 5    | `*`  | {0,2,4}            | 各种结果分别考虑+1、-1 |
+
+继续分析，是否需要将所有合法情况记录为一个数组？没必要，我们记录大致范围即可，反正我们最后是要判断是否有 0 这种方案。于是给出代码：
+
+```python
+class Solution:
+    def canBeValid(self, s: str, locked: str) -> bool:
+        # 奇数长度一定不匹配
+        if len(s) % 2 == 1:
+            return False
+        
+        min_score = 0
+        max_score = 0
+        for is_locked, c in zip(locked, s):
+            if is_locked == '1':
+                if c == '(':
+                    diff = 1
+                else:
+                    diff = -1
+                max_score += diff
+                min_score = max(0, min_score + diff)
+            else:
+                max_score +=1
+                min_score = max(0, min_score - 1)
+            if max_score < min_score: # 集合为空,不存在合法方案
+                return False
+            
+        return min_score == 0
+```
+
+> 力扣测试确实全部通过，但是还是存在一些逻辑上难以解释的问题(对比官方题解少了`(i + 1) % 2`)，这一点在下面分析叙述。
+
+首先需要知道的是偶数个 1 或 -1 相加结果一定是偶数，从而推导出奇数个 1 和 -1 相加是奇数。当 min_score 小于 0 时，其实…好吧一步步来，若是`min_score = -1`，啥情况？显然当前是第奇数个字符，此时它的下一种方案一定是 1(方案分数一定是奇数，且由上一个方案分化而来的两个子方案，一定分数连续)。若是`min_score = -2`呢？是否为第偶数个字符？但是这是不可能的，奇数位的最小合法分数为 1，偶数位就不可能通过 -1 达到 -2。由此我们其实也就知道一件事，在保证奇数位合法的情况下，偶数位不可能不合法(不会执行 `max` 函数)，由此上面的代码自然可以通过(先奇后偶)。最后给出力扣官方解法:
+
+```python
+class Solution:
+    def canBeValid(self, s: str, locked: str) -> bool:
+        n = len(s)
+        if n % 2 == 1:
+            return False
+        
+        min_score = 0
+        max_score = 0
+        for i in range(n):
+            if locked[i] == '1':
+                if s[i] == '(':
+                    diff = 1
+                else:
+                    diff = -1
+                max_score += diff
+                min_score = max((i + 1) % 2, min_score + diff)
+            else:
+                max_score += 1
+                min_score = max((i + 1) % 2, min_score - 1)
+            if max_score < min_score:
+                return False
+            
+        return min_score == 0
+```
+
+此外根据上面的理论，我们其实还可以提出另一种结题方式:字符串分数为0，且字符串任意前缀的分数大于等于 0 ,其实也就等效于: 字符串任意前缀的分数大于等于 0 ，且字符串任意后缀的分数小于等于 0 。但是似乎这样理解不太对，
+
+```python
+class Solution:
+    def canBeValid(self, s: str, locked: str) -> bool:
+        # 检查长度是否为奇数
+        if len(s) % 2 == 1:
+            return False
+        
+        # 任意前缀的分数大于等于0
+        balance = 0
+        for i in range(len(s)):
+            if locked[i] == '0' or s[i] == '(':
+                balance += 1 
+            else:
+                balance -= 1 
+            
+            if balance < 0:
+                return False
+        
+        # 任意后缀的分数小于等于0
+        balance = 0
+        for i in range(len(s)-1, -1, -1):
+            if locked[i] == '0' or s[i] == ')':
+                balance += 1 
+            else:
+                balance -= 1 
+            
+            if balance < 0:
+                return False
+        
+        return True
+```
+
+<br><img src="./assets/image-20250324160623901.png" alt="image-20250324160623901" style="zoom:67%;" />
+
+
+
+
+
+
+
+##### 3.24
+
+[2255. 统计是给定字符串前缀的字符串](https://leetcode.cn/problems/count-prefixes-of-a-given-string)
+
+一道很基础的简单题，代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def countPrefixes(self, words: List[str], s: str) -> int:
+        return sum(1 if s.startswith(w) else 0 for w in words )
+```
+

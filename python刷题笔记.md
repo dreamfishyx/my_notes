@@ -74,7 +74,70 @@
    map[apple].add(20)
    ```
 
-   
+
+
+
+
+
+##### Counter
+
+1. 在 Python 中，`Counter` 是 `collections` 模块中提供的一个高效计数工具类，专门用于统计可哈希对象的出现次数。它本质上是字典 dict 的子类，key 是元素，value 是元素的计数。
+
+2. 核心方法:
+
+   1. `elements()`返回一个迭代器，按元素出现次数重复生成元素。元素按首次出现的顺序排列,计数为 0 或负数时，元素不会被输出。
+
+      ```python
+      from collections import Counter
+      
+      c = Counter(a=3, b=2, c=1)
+      print(list(c.elements()))  # ['a', 'a', 'a', 'b', 'b', 'c']
+      ```
+
+   2. `most_common(n)`返回频率最高的前 `n` 个元素及其计数的元组列表,若省略 `n`，则返回所有元素。
+
+      ```python
+      from collections import Counter
+      
+      c = Counter('abracadabra')
+      print(c.most_common(2))  # [('a', 5), ('b', 2)]
+      ```
+
+   3.  `update(iterable_or_mapping)`合并新的可迭代对象或计数器到当前计数器中,计数叠加。
+
+      ```python
+      c = Counter(a=3, b=1)
+      c.update({'a': 1, 'b': 2})
+      print(c)  # Counter({'a': 4, 'b': 3})
+      ```
+
+   4. `subtract(iterable_or_mapping)`从当前计数器中减去另一个可迭代对象或计数器的计数,结果允许负数。
+
+      ```python
+      c = Counter(a=4, b=3)
+      c.subtract({'a': 2, 'b': 5})
+      print(c)  # Counter({'a': 2, 'b': -2})
+      ```
+
+   5. `total()`(Python 3.10+)返回所有计数的总和。
+
+      ```python
+      c = Counter(a=3, b=2)
+      print(c.total())  # 5
+      ```
+
+   6. `clear()`: 清空所有计数。
+
+   7. 继承自字典的方法:略。
+
+3. 计算:
+
+   1. 加法 `+`: 合并两个计数器，仅保留正计数。
+   2. 减法 `-`: 从第一个计数器减去第二个计数器，仅保留正计数。
+
+
+
+
 
 
 
