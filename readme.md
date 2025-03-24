@@ -3,7 +3,7 @@
 
 >  - (本目录文件由脚本自动生成, 不一定准确)该仓库为个人知识库，主要包含了一些学习笔记，技术文档等内容。
 >  - 个人博客地址：[Dream sea](https://dreamfish.cc)
->  - leetcode刷题:[力扣刷题日记](./leetcode刷题日记.md)
+>  - leetcode刷题：[力扣刷题日记](./leetcode刷题日记.md)
 
 
 
