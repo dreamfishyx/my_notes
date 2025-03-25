@@ -2348,3 +2348,107 @@ class Solution:
         return sum(1 if s.startswith(w) else 0 for w in words )
 ```
 
+
+
+
+
+##### 3.25
+
+[2711. 对角线上不同值的数量差](https://leetcode.cn/problems/difference-of-number-of-distinct-values-on-diagonals)
+
+比较简单的一道题，直接遍历各个位置，分别求解做上对角线和右下对角线，求值即可,代码如下:
+
+```python
+class Solution:
+    def differenceOfDistinctValues(self, grid: List[List[int]]) -> List[List[int]]:
+        m, n = len(grid), len(grid[0])
+        res = [[0] * n for _ in range(m)]
+
+        for i in range(m):
+            for j in range(n):
+                topLeft = set()
+                bottomRight = set()
+                # 从(i, j)出发，向左上角遍历,不包含(i, j)
+                # 所在方阵的宽度是min(i, j) + 1,k的范围是[1, min(i, j)]
+                for k in range(1,min(i, j) + 1):
+                    topLeft.add(grid[i - k][j - k])
+                # 从(i, j)出发，向右下角遍历,不包含(i, j)
+                # 所在方阵的宽度是min(m - 1 - i, n - 1 - j) + 1，也就是min(m - i, n - j),k的范围是[1, min(m - i, n - j) - 1]
+                for k in range(1,min(m - i, n - j)):
+                    bottomRight.add(grid[i + k][j + k])
+                res[i][j] = abs(len(topLeft) - len(bottomRight))
+        return res
+```
+
+当然上述代码的问题其实也是很明显的，对于处于同一个对角线上的元素，其实没必要每次都从头开始计算和从尾部开始计算，其实只需要两次遍历即可，只不过这种遍历方式与往常不同而已，是斜向遍历。<br><img src="./assets/image-20250325173107435.png" alt="image-20250325173107435" style="zoom:80%;" />
+
+> 实际上在写代码时犯了一个错误，不妨以计算 topLeft 过程中遍历上三角为例，我错误的认为结束条件为 `j==n `,也就是错误的以为越界一定是发生在右边。但是实际上这不是一个方阵，如上图实际上还可能从下方越界，也就是结束一条对角线遍历的条件是`j==n or i==m` ，其他遍历也是同理！！！
+
+最终代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def differenceOfDistinctValues(self, grid: List[List[int]]) -> List[List[int]]:
+        m, n = len(grid), len(grid[0])
+        res = [[0] * n for _ in range(m)]
+
+        topLeft = set()
+        bottomRight = set()
+
+        # 遍历上三角,沿着对角线遍历计算topLeft
+        for k in range(n):
+            # 重置i,j
+            i, j = 0, k
+            # 只会从右边或者下边越界，即i=m或者j=n
+            while j < n and i < m:
+                # 记录topLeft的值
+                res[i][j] = len(topLeft)
+                # 将当前元素加入topLeft
+                topLeft.add(grid[i][j])
+                # 向右下移动
+                i += 1
+                j += 1
+            # 当前对角线结束，清空topLeft
+            topLeft.clear()
+
+        # 遍历下三角,沿着对角线遍历计算topLeft
+        for k in range(1, m):
+            i, j = k, 0
+            # 只会从右边或者下边越界，即i=m或者j=n
+            while i < m and j < n:
+                res[i][j] = len(topLeft)
+                topLeft.add(grid[i][j])
+                i += 1
+                j += 1
+            topLeft.clear()
+
+        # 遍历下三角,沿着对角线遍历计算bottomRight
+        for k in range(n):
+            i, j = m - 1, k
+            # 只会从左边或者上边越界，即i=-1或者j=-1
+            while j >= 0 and i >= 0:
+                # 计算结果 |topLeft - bottomRight|
+                res[i][j] = abs(res[i][j] - len(bottomRight))
+                bottomRight.add(grid[i][j])
+                i -= 1
+                j -= 1
+            bottomRight.clear()
+
+        # 遍历上三角,沿着对角线遍历计算bottomRight
+        for k in range(0, m - 1):
+            i, j = k, n - 1
+            # 只会从左边或者上边越界，即i=-1或者j=-1
+            while i >= 0 and j >= 0:
+                # 计算结果 |topLeft - bottomRight|
+                res[i][j] = abs(res[i][j] - len(bottomRight))
+                bottomRight.add(grid[i][j])
+                i -= 1
+                j -= 1
+            bottomRight.clear()
+        
+        return res
+```
+
+总体来说还是比较简单的一道题，但是让我回忆起学数据结构是被矩阵压缩支配的恐惧，感觉那玩意计算位置比这要复杂一些！！！<br><img src="./assets/image-20250325174732215.png" alt="image-20250325174732215" style="zoom:67%;" />
