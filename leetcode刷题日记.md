@@ -2452,3 +2452,108 @@ class Solution:
 ```
 
 总体来说还是比较简单的一道题，但是让我回忆起学数据结构是被矩阵压缩支配的恐惧，感觉那玩意计算位置比这要复杂一些！！！<br><img src="./assets/image-20250325174732215.png" alt="image-20250325174732215" style="zoom:67%;" />
+
+
+
+
+
+
+
+##### 3.26
+
+[2829. k-avoiding 数组的最小总和](https://leetcode.cn/problems/determine-the-minimum-sum-of-a-k-avoiding-array)
+
+依旧是比较简单的一道题，估计又是周末放大招，哎~
+
+显然对于一个数  `k` 可以分解为 `k = a + b` ，不妨假设 `a<=b` ,由此根据题意只能选择 `a` 而抛弃 `b`。进一步可以知道$[1,k/2]$和$[k,+\infty]$是可以选择的区间，而$[k/2+1,k-1]$是要舍弃的部分。故而代码如下:
+
+```python
+class Solution:
+    def minimumSum(self, n: int, k: int) -> int:
+        half = k // 2
+        if n <= half:
+            # [1,k/2]足够填满前n个数
+            return sum(range(1, n + 1))
+        else:
+            # [1,k/2]填满前k/2个数，[k+1,n-k/2]填满后n-k/2个数
+            return sum(range(1, half + 1)) + sum(range(k, n -half + k))
+```
+
+当然其实这就是等差数列求和，没必要使用 `sum` 函数累加，直接使用求和公式即可，代码如下：
+
+```python
+class Solution:
+    def minimumSum(self, n: int, k: int) -> int:
+        half = k // 2
+        return (1 + n) * n // 2 \
+            if n <= half else \
+                (1 + half) * half // 2 + (k + n - half + k - 1) * (n - half) // 2
+```
+
+老规矩写一道贪心问题:[跳跃游戏 II](https://leetcode.cn/problems/jump-game-ii/)
+
+每次跳跃时都有一个可供跳跃的区间范围，可以在区间中选择一个跳的最远的位置，这样保证每次跳跃都使可到达距离最远，从而得到最少跳跃次数。例如下图中在 0 处下一步的可选跳跃区间为[1,2],选择 1 位置时下次可以跳跃的区间为 [3,4];但是选择位置 2 则下一次可跳跃区间只有 [3]。显然 1 是局部最优解。<br><img src="./assets/image-20250326162720181.png" alt="image-20250326162720181" style="zoom:66%;" />
+
+最终给出代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def jump(self, nums: List[int]) -> int:
+        n = len(nums)
+        max_reach = nums[0]
+        res = 1 if n > 1 else 0 # 最后一步跳跃额外计算
+        pos = 0
+        while max_reach < n - 1:
+            # 遍历可到达的位置，选择可以跳的最远的位置
+            for i in range(pos + 1, max_reach + 1):
+                if i + nums[i] > max_reach:
+                    max_reach = i + nums[i]
+                    pos = i
+            res += 1
+
+        return res
+```
+
+上述代码在处理长度为 1 的情况时不够优雅，因为需要兼顾最后一次跳跃的情况(`max_reach < n - 1`的存在导致不会执行)。实际上会依次遍历前面所有位置(直到可以到达后直接退出)，所以官解给出的代码很优雅(但是其实最后一段没有必要遍历,会有一些额外时间支出)：
+
+```python
+from typing import List
+
+class Solution:
+    def jump(self, nums: List[int]) -> int:
+        n = len(nums)
+        max_reach = 0  
+        step = 0
+        # 记录当前可已选择的最远位置
+        # 每次更新表示进入新的跳跃区间,需要增加跳跃次数
+        end = 0
+        for i in range(n - 1):
+            max_reach = max(max_reach, i + nums[i])
+            if i == end:
+                step += 1
+                end = max_reach
+        return step
+```
+
+当然官方还给出了一种逆向查找的思路，从终点开始，找最远的可到达当前位置的位置 p 作为前一个位置，依次分析。其实在最初接触这个思路时，脑子中冒出一个想法，要是我选的这个最远的位置 p 无法被到达(如 `[1,0,2,1,1]` )，那是不是需要退而求其次？其实仔细一想就发现，若是这个最远位置 p 无法到达，那么此次跳跃无论如何都无法到达终点，因为在 跳跃游戏I 中就已经分析出当可以到达某个位置时其前面的位置一定可以到达！！！给出代码:
+
+```python
+from typing import List
+
+class Solution:
+    def jump(self, nums: List[int]) -> int:
+        pos = len(nums) - 1
+        step = 0
+        while pos > 0:
+            # 找最远的能到达pos的点
+            for i in range(pos):
+                if i + nums[i] >= pos:
+                    pos = i
+                    step += 1
+                    break
+
+        return step 
+```
+
