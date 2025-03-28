@@ -2459,7 +2459,7 @@ class Solution:
 
 
 
-##### 3.26
+##### :apple:3.26
 
 [2829. k-avoiding 数组的最小总和](https://leetcode.cn/problems/determine-the-minimum-sum-of-a-k-avoiding-array)
 
@@ -2563,7 +2563,7 @@ class Solution:
 
 
 
-##### 3.17
+##### :maple_leaf:3.17
 
 [2712. 使所有字符相等的最小成本](https://leetcode.cn/problems/minimum-cost-to-make-all-characters-equal)
 
@@ -2583,7 +2583,6 @@ class Solution:
         n = len(s)
         # 前缀状态转移
         pre_dp =[[0] * (n + 1) for _ in range(2)]
-        # 前缀状态转移
         for i in range(1, n + 1):
             if s[i-1] == '1':
                 pre_dp[0][i] = pre_dp[1][i - 1] + i 
@@ -2625,7 +2624,68 @@ class Solution:
         return ans  
 ```
 
-> - 说实话根据上面的代码是不是说明两种方式的选取是以中间作为分界线的？
+> - 其实上述贪心代码和动态规划代码思路上存在交集，`cost[i]`等于`cost[i-1] + i`，且其中`cost[i-1]`所修正后的字符与`cost[i]`修正后的字符不同(一个 1 一个 0)，而相同是不作处理，从而可以通过递加求解代价！！！
+>
+> - 说实话根据上面的代码是不是说明两种方式的选取是以中间作为分界线的？或者不必那么精确的讨论一下两种方式的选择是否存在一个分界？这其实也是在动态规划问题中被默认的一点，未曾思考过的细节！！！
+>
+>   其实若是可以证明两种方式存在一个明确的分界，那么贪心就很好理解，只需要判别当前字符属于第一种方式还是第二种方式(此时只关注 0\~i 修正,选择代价最小的一种方式)，此时各自的代价就是`i`和`n-i`(这一点通过动态规划部分的分析很容易理解)。~~那么不妨假设第`i`位使用第二种方式最优()，那么在最优的情况下，第`i+1`位是否可能使用第一种方式呢？~~待补ing:eyes:
+>
 > - 上面的两种方式是否说明，转换某个字符，只对该字符个人而言代价为`i`或者`n-i`?
+>
+>   根据上一点，知道一个字符必定属于一种方式，而由于选择存在明确分解，那么其个人的代价就是在其他字符的基础之上另加 `i` 或者 `n-i` 。
 
-涉及贪心的结题思路难想也难懂！！！又是后劲比较大的一道题，又是自闭的一天，不过好在对动态规划的理解又加深了些…!!!<br><img src="./assets/image-20250327191937433.png" alt="image-20250327191937433" style="zoom:66%;" />
+涉及贪心的解题思路难想也难懂！！！又是后劲比较大的一道题，又是自闭的一天，不过好在对动态规划的理解又加深了些:eyes:…!!!<br><img src="./assets/image-20250327191937433.png" alt="image-20250327191937433" style="zoom:66%;" />
+
+
+
+
+
+
+
+##### :heart:3.28
+
+[2716. 最小化字符串长度](https://leetcode.cn/problems/minimize-string-length/)
+
+比较简单的一道题，逢二减一即可，代码如下:
+
+```python
+class Solution:
+    def minimizedStringLength(self, s: str) -> int:
+        num_map = {}
+        res = len(s)
+        for c in s:
+            num_map[c] = num_map.get(c, 0) + 1
+            if num_map[c] == 2:
+                res -= 1
+                num_map[c] -= 1
+        
+        return res
+```
+
+其实就是所有的字符只能留下一个，可以直接使用 set 去重，答案如下:
+
+```python
+class Solution:
+    def minimizedStringLength(self, s: str) -> int:  
+        return len(set(s))
+```
+
+今天的题比较简单，开始刷一下 leetcode100 : [1. 两数之和](https://leetcode.cn/problems/two-sum/)
+
+其实就是一个查找题，对于`nums[i]`,需要在数组中查找`target - nums[i]`，此时查找就有很多方式，例如排序 + 二分等等。但是这题的主要时间就在查找这儿，可是还有什么比哈希表查找快的呢？
+
+```python
+from typing import List
+
+class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        map = {}
+        for i, num in enumerate(nums):
+            if target - num in map:
+                return [map[target - num], i]
+            # 记录当前数字及其索引
+            map[num] = i
+            
+        return []
+```
+
