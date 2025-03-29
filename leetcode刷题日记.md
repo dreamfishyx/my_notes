@@ -2690,3 +2690,117 @@ class Solution:
 ```
 
 其实这样更像是，先找到`target - k`(但是你不知道,于是存入哈希表中)，后找到 k,这种方式还是比较常见的！！！
+
+
+
+
+
+
+
+##### :art:3.29
+
+[2360. 图中的最长环](https://leetcode.cn/problems/longest-cycle-in-a-graph)
+
+比较简单的一道题，直接 dfs 即可。但是题目中其实提到，两个节点直接最多只有一个有向边，那么可以知道以下推论:
+
+- 若是当前节点向后遍历，最终无法形成环，那么这些节点必定不可能出现在某个环中。
+- 若是当前节点向后遍历可以形成环，则形成环的节点必定不可能出现在一个新环中。
+
+至此，可以知道某个节点要么不会在环中，要么只会在一个唯一的环中，即求解过程中每个节点仅仅需要访问一次即可。考虑到从当前节点开始向下遍历形成环时，存在两种情况，即整体环(该次遍历中所有节点组成环)和局部环(该次遍历中所有节点的一部分组成环)。对于部分环的情况，要想计算长度，可以借鉴偏移量 offset 的方式计算。给出代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def longestCycle(self, edges: List[int]) -> int:
+        # 记录每个节点访问顺序
+        visited_map = {}
+        # 记录最长环的长度
+        res = -1
+        for i in range(len(edges)):
+            # 如果节点已经访问过，则跳过
+            if i in visited_map:
+                continue
+            offset = 0
+            while i != -1 :
+                # 存储当前节点的偏移量
+                visited_map[i] = offset
+                offset += 1
+                i = edges[i]
+                # 存在环,则计算环的长度
+                if i in visited_map:
+                    res = max(res, offset - visited_map[i])
+                    break
+        return res
+```
+
+但是上述代码在 `[-1,4,-1,2,0,4]` 测试时错误。根源是没有考虑整体环和局部环中环重复的情况，只需要判断一次，否则第二次会由于第一次的数据遗留导致误以为形成新环从而出错(第一次的时候将某些节点标记为已访问转态)。
+
+对此，其实也很好处理。将上述代码的相对偏移量改为绝对偏移量，若是某个节点已访问，则需要判断是否为当次遍历访问，若是则表明找到新环；若不是，表明当前节点已经处理过，直接结束当次遍历，代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def longestCycle(self, edges: List[int]) -> int:
+        # 记录每个节点访问顺序
+        visited_map = {}
+        # 记录最长环的长度
+        res = -1
+        offset = 0
+        for i in range(len(edges)):
+            # 如果节点已经访问过，则跳过
+            if i in visited_map:
+                continue
+            # 记录当次遍历的最小偏移量
+            min_offset = offset
+            while i != -1 :
+                # 存储当前节点的偏移量
+                visited_map[i] = offset
+                offset += 1
+                i = edges[i]
+                # 存在环
+                if i in visited_map:
+                    if visited_map[i] >= min_offset:
+                        # 之前未访问过的节点，说明是新环,则计算环的长度
+                        res = max(res, offset - visited_map[i])
+                    break
+        return res
+```
+
+老规矩，刷一道 hot 100:[2. 两数相加](https://leetcode.cn/problems/add-two-numbers)
+
+比较简单的一道题，其实就是模拟多位整数的加法运算，设置一个进位变量即可。一些细节问题如:两个整数位数不一致、最后一位计算完存在进位可能需要稍微注意。为了方便链表的创建，可以设置一个头结点，并在最后返回结果时去掉即可。
+
+```python
+from typing import Optional
+
+class Solution:
+    def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+        # 定义进位
+        carry = 0
+        # 定义头结点和指针p
+        res = p =  ListNode(0)
+        while l1 or l2 or carry:
+            # 取出当前节点的值
+            x = l1.val if l1 else 0
+            y = l2.val if l2 else 0
+
+            # 计算当前位和
+            total = x + y + carry
+            carry = total // 10
+
+            # 创建新节点
+            p.next = ListNode(total % 10)
+            p = p.next
+
+            # l1和l2后移
+            if l1:
+                l1 = l1.next 
+            if l2:
+                l2 = l2.next
+
+        # 去掉初始的头结点并返回结果
+        return res.next  
+```
+
