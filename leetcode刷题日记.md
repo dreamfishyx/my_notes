@@ -2804,3 +2804,48 @@ class Solution:
         return res.next  
 ```
 
+
+
+
+
+
+
+##### :four_leaf_clover:3.30
+
+[2109. 向字符串添加空格](https://leetcode.cn/problems/adding-spaces-to-a-string)
+
+依旧是比较简单的一道题，由于 spaces 数组中的所有值严格递增，完全可以同时遍历字符串和 spaces 数组，在对应位置添加空格即可，代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def addSpaces(self, s: str, spaces: List[int]) -> str:
+        res = ''
+        p = 0
+        for i, c in enumerate(s):
+            if p < len(spaces) and i == spaces[p]:
+                res += ' '
+                p += 1
+            res += c
+        return res
+```
+
+当然上述代码存在一点效率问题，python 中字符串是不可变类型，所以对字符串进行加法运算时需要将原字符串复制一遍，而上面需要 `n+m` 次复制，显然是有些浪费资源的。可以改为数组存储字符，最后返回结果时转为字符串即可，代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def addSpaces(self, s: str, spaces: List[int]) -> str:
+        res = []
+        p = 0
+        for i, c in enumerate(s):
+            if p < len(spaces) and i == spaces[p]:
+                res.append(' ')
+                p += 1
+            res.append(c)
+        return ''.join(res)
+        
+```
+
