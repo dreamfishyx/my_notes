@@ -2849,3 +2849,161 @@ class Solution:
         
 ```
 
+
+
+
+
+
+
+
+
+##### 3.31
+
+[2278. 字母在字符串中的百分比](https://leetcode.cn/problems/percentage-of-letter-in-string)
+
+很简单的一道题，遍历计算字符出现次数即可，代码如下:
+
+```python
+class Solution:
+    def percentageLetter(self, s: str, letter: str) -> int:
+        n = len(s)
+        count = 0
+        for c in s:
+            if c == letter:
+                count += 1
+        return count * 100 // n
+```
+
+老规矩再做一道 hot 100:[4. 寻找两个正序数组的中位数](https://leetcode.cn/problems/median-of-two-sorted-arrays)
+
+由于两个数组都是正序，且需要找中位数，直接同时遍历两个数组，每次从中找出较小者即可，代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
+        m, n = len(nums1), len(nums2)
+        half = int((m + n) / 2 + 0.5)
+        # 根据长度奇偶性，设置中位数的大小
+        ans_size = 2 if (m + n) % 2 == 0 else 1
+        n1, n2 = 0, 0
+        res = 0
+        for i in range(1,half+ans_size):
+            # nums1小于nums2且nums1剩余元素，或者nums2已经遍历完
+            # 条件的判断顺序不能调换，否则会导致数组越界
+            if n2 >= n or (n1 < m and nums1[n1] < nums2[n2]):
+                n1 += 1
+                if i >= half:
+                    res += nums1[n1-1]
+            else:
+                n2 += 1
+                if i >= half:
+                    res += nums2[n2-1]
+
+        return res / ans_size
+```
+
+其实上面还是有一个细节问题，就是选择数组时的判断条件的顺序不能更改，不然可能数组越界。当然上述代码能够解决问题，还得感谢短路求值
+
+> 在 Python 中，逻辑运算符 `and` 和 `or` 使用的是短路求值特性，也称为惰性求值。
+>
+> 1. 对于 `and` 运算符：
+>    - 如果第一个操作数评估为假（False），整个表达式立即返回第一个操作数的值，而不会评估第二个操作数。
+>    - 如果第一个操作数评估为真（True），则返回第二个操作数的值。
+> 2. 对于 `or` 运算符：
+>    - 如果第一个操作数评估为真（True），整个表达式立即返回第一个操作数的值，而不会评估第二个操作数。
+>    - 如果第一个操作数评估为假（False），则返回第二个操作数的值。
+
+但是这个时间复杂度实际上不满足题目要求，题目要求的时间复杂度 `O(log (m+n))`，是想要我使用二分法吗？不妨想这样一件事，那就是`nums1`的`[:a]`、`nums2`的`[:b]`,且有两部份加起来恰好满足总长度一半，那么`nums1+nums2`的中位数(c)有啥关系？若是`nums1[a] > nums2[b]`,那么显然c应该满足`nums1[a] > c > nums2[b]`，此时就可以排除 `[:b]`这一部分，这二分法不就来了！！！关键的一点那就是要始终保证两部分的数加起来满足一半，然后一个缩短一个扩张(直至最后恰好将中位数框住)。代码写起来还是有点难，思路还是不够清晰(下面换一种理解思路)，尤其奇偶对半分的逻辑(要保证总是满足一半,但是直接对半分，由于直接整除会导致元素减少)，最终代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
+        m,n = len(nums1), len(nums2)
+        total = m + n
+        if total % 2 == 0:
+            return (self.findKth(nums1, 0, nums2, 0, total // 2) + self.findKth(nums1, 0, nums2, 0, total // 2 + 1)) / 2
+        else:
+            return self.findKth(nums1, 0, nums2, 0, total // 2 + 1)
+        
+        
+    def findKth(self, nums1: List[int], i: int, nums2: List[int], j: int, k: int) -> float:
+        """
+        寻找两个正序数组的第k小元素,但是为方便理解，换一种说法,叫做寻找两个正序数组的前k个元素。
+        不妨记这k个元素组成的集合为A,其中第k个元素记为a。
+        题外话: k // 2 + k //2 = k (k为偶数)，k // 2 + k // 2 + 1 = k (k为任意整数)
+        """
+        # 一个数组到头，说明该数组的元素都属于A(不含a)被选中,所以另一个数组的候选部分也一定属于A(含a,返回a即可)
+        if i >= len(nums1):
+            return nums2[j + k - 1] 
+        if j >= len(nums2):
+            return nums1[i + k - 1]
+        
+        # 最后还需选取 1 个元素(即a),选取最小的元素作为a即可
+        if k == 1:
+            return min(nums1[i], nums2[j]) 
+        
+        # 若是超出了数组的范围，说明没有当前数组足够元素可供候选(少于 k//2 )
+        # 由于需要满足k个元素,即使当前数组全选中,另一个数组也要选取大于 k//2个元素
+        # 显然，另一个数组可以放心大胆的将 k//2 个候选全选中。
+        mid_val1 = float('inf') if i + k//2 - 1 >= len(nums1) else nums1[i + k//2 - 1]
+        mid_val2 = float('inf') if j + k//2 - 1 >= len(nums2) else nums2[j + k//2 - 1]
+        
+        # 由于需要满足k个元素,不能直接笼统使用 k//2。选中 k // 2个元素的部分,剩余部分就是k - k//2个元素
+        if mid_val1 < mid_val2:
+            # 选取nums1[i:i+k//2]属于A(a不在其中),然后剩余 k - k//2个元素尝试两个数组各自提供一半作为候选
+            return self.findKth(nums1, i + k//2, nums2, j, k - k//2)
+        else:
+            return self.findKth(nums1, i, nums2, j + k//2, k - k//2)
+```
+
+但是感觉上述代码还可以简化，对于偶数长度，两次查找存在其实是可以衔接的,可以简化为一次,代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
+        m,n = len(nums1), len(nums2)
+        total = m + n
+        if total % 2 == 1:
+            ans = self.findKth(nums1, 0, nums2, 0, total//2 + 1, False)
+        else:
+            ans = self.findKth(nums1, 0, nums2, 0, total//2, True)
+        return sum(ans) / len(ans) 
+        
+        
+    def findKth(self, nums1: List[int], i: int, nums2: List[int], j: int, k: int,mod:bool) -> list:
+        if i >= len(nums1):
+            return [nums2[j+k-1], nums2[j+k]] if mod else [nums2[j+k-1]]
+        if j >= len(nums2):
+            return [nums1[i+k-1], nums1[i+k]] if mod else [nums1[i+k-1]]
+        if k == 1:
+            if mod:
+                t = [nums1[i], nums2[j]]
+                if i + 1 < len(nums1):
+                    t.append(nums1[i+1])
+                if j + 1 < len(nums2):
+                    t.append(nums2[j+1])
+                t.sort()
+                return t[:2]
+            else:
+                return [min(nums1[i], nums2[j])]
+        
+        mid_val1 = float('inf') if i + k//2 - 1 >= len(nums1) else nums1[i + k//2 - 1]
+        mid_val2 = float('inf') if j + k//2 - 1 >= len(nums2) else nums2[j + k//2 - 1]
+        
+        if mid_val1 < mid_val2:
+            return self.findKth(nums1, i + k//2, nums2, j, k - k//2, mod)
+        else:
+            return self.findKth(nums1, i, nums2, j + k//2, k - k//2, mod)
+```
+
+
+
+很多时候人们所谓命运的安排，不过是潜意识里本心的选择罢了,而我无愧本心，所以我从不抗拒将自己交给命运！(看似命运安排的情节，或许正是灵魂早已写好的剧本。———deepseek)
+
+感觉以后或许会尝试写一本书……emmm……或许吧
