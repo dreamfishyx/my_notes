@@ -2573,7 +2573,7 @@ class Solution:
 
 1. 不一定是从一个固定转态转移到下一个转态，也就是一个问题肯能依赖一圈问题的解。
 2. <font color=red>不一定是单个转态集合之间的转变，可能是不同转态集合之前来回切换。</font>
-3. 有是可以对记忆数组进行优化，注意转态的构建顺序。
+3. 有是可以对存储数组进行优化，注意转态的构建顺序。
 
 不放将前缀转为全 0 记作`cost_0[i]`,同理将前缀全转为 1 记作`cost_1[i]`,其实`cost_1[i] = cost_0[i-1] + i`，哎，上面的动态规划还是没有想到点子上。不放记 `abc...ef0` 这样一个 `i` 位二进制序列，计算一下它的`cost_0[i]`,显然根据上面分析知道需要从最右边开始修正，此时将 1 修正为 0，需要代价 `i` ,但是部分 `abc...ef` 会被取反记作`-abc...ef`。那么`cost_0[i] = i + cost{-abc...ef}`,其中`cost{-abc...ef}`表示将`abc...ef`取反后转为全 0 的代价，其实就等于`cost_1[i-1]`,即将`abc..ef`转为全 0 的代价，这一定很容易理解。此时就可以构建前缀状态转移方程:对于 `cost_0` 而言:若是`char[i] = 0`,则`cost_0[i]=cost_0[i-1]`,反之等于`cost_0[i] = i + cost_1[i-1]`。同理对于 `cost_1` 而言:若是`char[i] = 1`,则`cost_1[i]=cost_1[i-1]`,反之等于`cost_1[i] = i + cost_0[i-1]`。后缀同理，给出代码如下:
 
@@ -3002,8 +3002,141 @@ class Solution:
             return self.findKth(nums1, i, nums2, j + k//2, k - k//2, mod)
 ```
 
-
-
 很多时候人们所谓命运的安排，不过是潜意识里本心的选择罢了,而我无愧本心，所以我从不抗拒将自己交给命运！(看似命运安排的情节，或许正是灵魂早已写好的剧本。———deepseek)
 
 感觉以后或许会尝试写一本书……emmm……或许吧
+
+
+
+
+
+
+
+#### 四月
+
+##### :maple_leaf:4.1
+
+[2140. 解决智力问题](https://leetcode.cn/problems/solving-questions-with-brainpower)
+
+dfs+记忆话搜索或者动态规划即可。
+
+刚开始想到使用dfs+记忆化搜索。但是关于记忆话搜索的部分，初始时写出的代码存在问题，稍微记录一下，给出问题代码如下:
+
+```python
+from functools import cache
+from typing import List
+
+class Solution:
+    def mostPoints(self, questions: List[List[int]]) -> int:
+        n = len(questions)
+        @cache
+        def dfs(index: int,point_sum: int):
+            if index >= n:
+                return point_sum
+            # 不选择当前问题
+            skip = dfs(index + 1, point_sum)
+            # 选择当前问题
+            solve = dfs(index + questions[index][1] + 1, point_sum + questions[index][0])
+            return max(skip, solve)
+            
+        return dfs(0, 0)
+```
+
+上面代码，使用记忆化搜索，但是将分数和也作为校验的参数，这其实就导致缓存命中的概率大大减小。我们可以将 dfs 的返回值略作修改，改为后面部分获得的分数，使得计算结果的可复用性大大提高。现在给出修改后的代码:
+
+```python
+from functools import cache
+from typing import List
+
+class Solution:
+    def mostPoints(self, questions: List[List[int]]) -> int:
+        n = len(questions)
+        @cache
+        def dfs(index: int):
+            if index >= n:
+                return 0
+            # 不选择当前问题
+            skip = dfs(index + 1)
+            # 选择当前问题
+            solve = dfs(index + questions[index][1] + 1) + questions[index][0]
+            return max(skip, solve)
+            
+        return dfs(0)
+```
+
+其实做了那么多道动态规划题，这题也很容易想到动态规划。但是这题正向动态不太好做(找前一个状态比较麻烦,后面会说明),但是对于做题而言`A->B->C`其实也可以视作`C->B->A`,分数是一样的。那么不妨反向动态，定义`dp[i]`表示从`questions[i:]`可以获得的最大分数，对于当前题，若是不写则等于`dp[i + 1]`,若是写则等于`dp[min(i + questions[i][1] + 1, n)]`,取二者最大值即可。
+
+```python
+from typing import List
+
+class Solution:
+    def mostPoints(self, questions: List[List[int]]) -> int:
+        n = len(questions)
+        dp = [0] * (n + 1)
+        for i in range(n - 1, -1, -1):
+            # 注意防止越界,这也是初始化dp长度为n+1的原因
+            dp[i] = max(dp[i + 1], questions[i][0] + dp[min(i + questions[i][1] + 1, n)])
+        return dp[0]
+```
+
+~~对于正向动态规划，不妨也尝试一下，那么定义`dp[i]`表示从`questions[:i]`可以获得的最大分数，对于当前题，若是不写则等于`dp[i - 1]`,若是写则等于`dp[max(0,j-1)]`(其中`j + questions[j][1] + 1 =i`),取二者最大值即可。给出代码如下:~~
+
+```python
+from typing import List
+
+class Solution:
+    def mostPoints(self, questions: List[List[int]]) -> int:
+        n = len(questions)
+        dp = [0] * (n + 1)
+        # 正向动态:dp[i]表示[:i-1]的最大分数
+        for i in range(n):
+            # 不选当前问题
+            skip = dp[i]
+
+            # 选当前问题时找当上一个可选问题
+            j = i - 1
+            while j >= 0:
+                if questions[j][1] + j + 1== i:
+                    break
+                j -= 1
+            solve = questions[i][0] + dp[j+1]
+
+            # 取最大值
+            dp[i + 1] = max(skip, solve)
+        return dp[n]
+```
+
+很不幸的是上面的代码提交后是错误的，那么问题出在哪里呢？姑且先提出一点，那就是上一个可选问题是否唯一？例如这样一个例子`[3,1],[2,0],[1,1]]`,对于第 3 个问题而言其上一个可选问题存在两个，但是上述代码只会找第一个，这显然是不对的,但这只是其一！
+
+此外，考虑另一个问题，对于反向动态规划，由于前一个问题选中选导致后面一系列问题无法选中，故而才有`dp[i]`到`dp[min(i + questions[i][1] + 1, n)]`的跳转，那么正向动态规划凭什么跳转？`dp[i]`一定是从`dp[j]`来的吗？显然不是，当我选择`i`问题的时候，我前面的问题是否可选取决于**这些j问题**各自是否被选择，若是选择情况不同，`dp[i]`的来源是不同的，不妨看一下这样一个例子去试图理解这样一句话:<font color=red>j~i之间问题的选取不取决于i是否选取，而是取决于 j 是否选取!</font>
+
+```python
+question = [[3,5],[5,1],[1,3][2,2],[100,1][1,0][1,2]]
+#若是选择 0,则结果[0,6]
+#若是不选 0 选 2,则结果[2,6]
+#若是不选 0、2选 3,则结果[1,3,6]
+# 若是0、2、3都不选,则结果[1,4,6]、[1,5,6]
+这个例子其实也就回答了上面的问题，当 i = 6时,若是我选择 i ,那么j~i之间的问题一定就不能选吗？例子举的很明白，j~i之间问题的选取不取决于i是否选取，而是取决于 j 是否选取！！！对于当前 i 而言，很难判断其到底来自哪一个状态！！！
+```
+
+其实上面的分析就引出另一种正向遍历思路,那就是在处理 j 问题时偷偷预处理 i 所在状态(i、j是相对于上面分析思路而言)。emmm…这难道是……转说中的……上班摸鱼大法？给出代码如下:
+
+```python
+class Solution:
+    def mostPoints(self, questions: List[List[int]]) -> int:
+        n = len(questions)
+        # dp[i] 表示考虑前i个问题能获得的最大分数
+        dp = [0] * (n + 1)
+        
+        for j in range(n):
+            # 当前问题选中,处理下一个状态 i
+            # 若是越界,直接作为侯选结果
+            i = min(n, j + questions[j][1] + 1)
+            dp[i] = max(dp[i], dp[j] + questions[j][0])
+
+            # 当前问题不选中,处理下一个状态 j + 1
+            dp[j + 1] = max(dp[j + 1], dp[j])
+
+        return dp[n]
+```
+
