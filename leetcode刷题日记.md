@@ -1622,7 +1622,7 @@ class Solution:
 
 为啥 f1 要初始化为 `float('-inf')` ? f1 一定要包含 b ，若是初始化为任意负数，若是遇到 a 可能会导致 f1 变为正数，此时是不合法的(这时 f1 不应该存在值)。或者可以理解为`-inf` 是一种标志值，表示当前值不存在或者不合法，只有当其中出现 b 之后标志位才会被清理(很巧妙)！！！
 
-当然其实官解更妙些，没有遍历字符串，而是使用字典记录各个字符的位置，后续就没必要全部遍历！！！
+当然其实官解更妙些，没有遍历字符串，而是使用字典记录各个字符的位置，后续就没必要全部遍历,直接根据字典中存储的位置列表跳转即可！！！
 
 
 
@@ -3138,5 +3138,143 @@ class Solution:
             dp[j + 1] = max(dp[j + 1], dp[j])
 
         return dp[n]
+```
+
+
+
+
+
+
+
+
+
+##### :two_hearts:4.2
+
+[2873. 有序三元组中的最大值 I](https://leetcode.cn/problems/maximum-value-of-an-ordered-triplet-i)
+
+首先可定是根据题意来一遍暴力模拟，分别遍历i、j、k,计算最大值，代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def maximumTripletValue(self, nums: List[int]) -> int:
+        n = len(nums)
+        res = 0
+        for i in range(n-2):
+            for j in range(i+1, n-1):
+                for k in range(j+1, n):
+                    res = max(res, (nums[i] - nums[j]) * nums[k])
+        return res
+```
+
+实际上不难分析出:以 `j` 作为参考系时，根据贪心原理，`i` 要取 `[:j-1]` 中最大值，而 `k` 同理要取 `[j+1:]` 中最大值，对此可以先一次遍历计算前缀和后缀最大值，然后遍历 `j` 计算结果即可。
+
+```python
+from typing import List
+
+class Solution:
+    def maximumTripletValue(self, nums: List[int]) -> int:
+        """
+        pre_max[i]表示[:i-1]的最大值
+        suf_max[i]表示[i+1:]的最大值
+        """
+        n ,ans = len(nums), 0
+        pre_max ,suf_max = [0] * n, [0] * n
+
+        for i in range(1, n):
+            pre_max[i] = max(pre_max[i - 1], nums[i - 1])
+            suf_max[n - i - 1] = max(suf_max[n - i], nums[n - i])
+
+        for j in range(1, n - 1):
+            ans = max(ans, (pre_max[j] - nums[j]) * suf_max[j])
+
+        return ans
+```
+
+当然不妨看看官方题解最好的一种解法，那就是遍历`k`作为参考，那么`nums[i] - nums[j]`需要`[:k-1]`中取最大。而 `nums[i] - nums[j]` 最大值的计算就有点妙，可以维护`nums[i]`的最大值 `imax`，并根据 `imax `维护 `dmax = nums[i] - nums[j]`。但是这里实际上有些细节问题需要分析一下(后面解释)，代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def maximumTripletValue(self, nums: List[int]) -> int:
+        imax ,dmax,ans = 0,0,0
+        for i in range(len(nums)):
+            # 先计算ans,保证dmax和imax是[:i-1]的最大值
+            ans = max(ans,dmax*nums[i])
+
+            # 维护[:i-1]中最大差值
+            dmax = max(dmax,imax-nums[i])
+
+            # 维护[:i-1]的最大值
+            imax = max(imax,nums[i])
+        
+        return ans
+```
+
+> - 实际上，上述代码存在一个问题，它可能导致 `i=j` 的情况出现，但是这对最终的结果其实并没有影响。`i=j` 的情况啥时候出现？那就是 `j` 前面的元素全部小于`j`,此时 `dmax` 就恰是 `i=j` 的情况。而这种情况下，若是除去`i=j`后的 `dmax` 一定是负数，导致计算的下标三元组的值为负数。而题目说若是全负数则返回零，即等效于记`dmax=0`。但是若是题目没有这个全负数返回0，上面代码就一定会导致负数结果无法返回，可能在逻辑上需要稍作修改。
+> - 此外，官解还提供一种解法，遍历 `k` ,然后遍历 `j` 的同时维护`imax`,原理基本相似。但个人感觉还是遍历 `j` 搭配前后缀更好想一点。
+
+hoot 100:[3. 无重复字符的最长子串](https://leetcode.cn/problems/longest-substring-without-repeating-characters)，昨天在整理滑动窗口时找到这题，今天补一下。
+
+很标准的滑动窗口问题，不断扩张窗口直到出现重复字符，记录长度，收缩窗口直到不再出现重复字符。代码如下:
+
+```python
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        right = left = 0
+        max_length = 0
+        char_set = set()
+        while right < len(s):
+            if s[right] not in char_set:
+                # 不会重复,right指针右移,窗口扩大
+                char_set.add(s[right])
+                right += 1
+                max_length = max(max_length, right - left)
+            else :
+                # 会重复,left指针右移,窗口缩小(直到不重复)
+                char_set.remove(s[left])
+                left += 1
+        return max_length
+```
+
+其实上面代码还可以优化，当然俺目前是想不到的。对于窗口缩小的逻辑，实际上比较低效。可以直接在元素进入窗口时记录元素的位置，这样缩小窗口可以直接一步到位。不过这种优化方式很熟悉，似乎在某个每日一题的官解中看到过([2272. 最大波动的子字符串(2025.3.16)](https://leetcode.cn/problems/substring-with-largest-variance/))。代码如下:
+
+```python
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        right = left = max_length = 0
+        char_map = {}
+        while right < len(s):
+            if s[right] not in char_map:
+                char_map[s[right]] = right
+                right += 1
+                max_length = max(max_length, right - left)
+            else :
+                # 直接获取到重复字符的索引,缩小窗口
+                left = max(left, char_map[s[right]] + 1)
+                del char_map[s[right]]
+        return max_length
+```
+
+但是上面代码的耗时在力扣提交时明显提高，猜测可能和频繁的 del操作有关(找不到原因，只能乱甩锅了)。尝试不删除数据，而是更新位置，此时需要判断该位置是否在窗口中(防止旧数据干扰)，代码如下:
+
+```python
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        right = left = max_length = 0
+        char_map = {}
+        while right < len(s):
+            # 当前面的字符已经存在于字典中，且索引大于等于left时，更新left
+            if s[right] in char_map and char_map[s[right]] >= left:
+                left = char_map[s[right]] + 1
+            else:
+                max_length = max(max_length, right - left + 1)
+            
+            # 更新字符的索引
+            char_map[s[right]] = right
+            right += 1
+        return max_length
 ```
 
