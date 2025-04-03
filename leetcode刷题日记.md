@@ -3203,17 +3203,17 @@ class Solution:
         for i in range(len(nums)):
             # 先计算ans,保证dmax和imax是[:i-1]的最大值
             ans = max(ans,dmax*nums[i])
-
+            
+            # 维护[:i-1]的最大值
+            imax = max(imax,nums[i])
+            
             # 维护[:i-1]中最大差值
             dmax = max(dmax,imax-nums[i])
 
-            # 维护[:i-1]的最大值
-            imax = max(imax,nums[i])
-        
         return ans
 ```
 
-> - 实际上，上述代码存在一个问题，它可能导致 `i=j` 的情况出现，但是这对最终的结果其实并没有影响。`i=j` 的情况啥时候出现？那就是 `j` 前面的元素全部小于`j`,此时 `dmax` 就恰是 `i=j` 的情况。而这种情况下，若是除去`i=j`后的 `dmax` 一定是负数，导致计算的下标三元组的值为负数。而题目说若是全负数则返回零，即等效于记`dmax=0`。但是若是题目没有这个全负数返回0，上面代码就一定会导致负数结果无法返回，可能在逻辑上需要稍作修改。
+> - (2025.4.3:看懂思路就开始写，但凡认真看一下关键都不会出这笑话,后面描述的问题在官解中不存在，个人问题没仔细看解代码,标准答案参考 4.3 每日一题解题日记。)实际上，上述代码存在一个问题，它可能导致 `i=j` 的情况出现，但是这对最终的结果其实并没有影响。`i=j` 的情况啥时候出现？那就是 `j` 前面的元素全部小于`j`,此时 `dmax` 就恰是 `i=j` 的情况。而这种情况下，若是除去`i=j`后的 `dmax` 一定是负数，导致计算的下标三元组的值为负数。而题目说若是全负数则返回零，即等效于记`dmax=0`。但是若是题目没有这个全负数返回0，上面代码就一定会导致负数结果无法返回，可能在逻辑上需要稍作修改。
 > - 此外，官解还提供一种解法，遍历 `k` ,然后遍历 `j` 的同时维护`imax`,原理基本相似。但个人感觉还是遍历 `j` 搭配前后缀更好想一点。
 
 hoot 100:[3. 无重复字符的最长子串](https://leetcode.cn/problems/longest-substring-without-repeating-characters)，昨天在整理滑动窗口时找到这题，今天补一下。
@@ -3277,4 +3277,159 @@ class Solution:
             right += 1
         return max_length
 ```
+
+
+
+
+
+
+
+
+
+##### :clown_face:4.3
+
+[2874. 有序三元组中的最大值 II](https://leetcode.cn/problems/maximum-value-of-an-ordered-triplet-ii)
+
+其实就是昨天的每日一题，不过多半暴力模拟是过不了，给出如下代码:
+
+```python
+from typing import List
+
+class Solution:
+    def maximumTripletValue(self, nums: List[int]) -> int:
+        n, ans = len(nums), 0
+        pre_max, suf_max = [0] * (n+1), [0] * (n+1)
+        for i in range(1, n+1):
+            pre_max[i] = max(pre_max[i-1], nums[i-1])
+            suf_max[n-1-i] = max(suf_max[n-i], nums[n-i])
+        
+        for j in range(1, n-1):
+            ans = max(ans, (pre_max[j]-nums[j]) * suf_max[j])
+        
+        return ans
+```
+
+```python
+from typing import List
+
+class Solution:
+    def maximumTripletValue(self, nums: List[int]) -> int:
+        imax,dmax,ans=0, 0, 0
+        for i in range(len(nums)):
+            ans=max(ans,dmax*nums[i])
+            imax=max(imax,nums[i])
+            dmax=max(dmax,imax-nums[i])
+        return ans
+```
+
+昨天的每日一题中，提到上一个代码存在`i=j`的情况，其实也和好处理(今天再写一遍代码就想明白了),其实就是利用更新的顺序形成信息差，代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def maximumTripletValue(self, nums: List[int]) -> int:
+        imax,dmax,ans=0, 0, 0
+        for i in range(len(nums)):
+            # 此时 dmax是[:i-1]]之前的最大值
+            ans=max(ans,dmax*nums[i])
+            
+            # dmax在imax之前更新,则 j > i一定成立
+            dmax=max(dmax,imax-nums[i])
+            imax=max(imax,nums[i])
+        return ans
+```
+
+本来心情好好的，一看官解天塌了，官解一直就是使用上面这个无误的解法。是我自个昨天看了一下思路就开始自己写，从头到尾没看官解代码闹出的笑话！！！<br><img src="./assets/image-20250403124320344.png" alt="image-20250403124320344" style="zoom:75%;" />
+
+老规矩，hot 100:[5. 最长回文子串](https://leetcode.cn/problems/longest-palindromic-substring)
+
+emmm…对于回文串这种典型的动态规划问题，还是需要牢记的，代码如下:
+
+```python
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        n = len(s)
+        dp = [[True] * n for _ in range(n)]
+        max_len = 1
+        start = 0
+        for i in range(n-1, -1, -1):
+            for j in range(i + 1, n):
+                if s[i] == s[j]:
+                    dp[i][j] = dp[i+1][j-1]
+                else:
+                    dp[i][j] = False
+                if dp[i][j] and j - i + 1 >= max_len:
+                    # 添加 = 只是为和力扣期望结果一致
+                    max_len = j - i + 1
+                    start = i
+
+        return s[start:start + max_len]
+```
+
+显然可以使用滚动数组的方式(每次遍历 `i` 用的都是 `dp[i+1]` 行的数据)，对代码进行空间优化。但是对于动态规划的空间优化而言，很关键的一点就是要避免数据覆盖问题。例如本题中，若是改用`dp[j]` 表示 `i-1` 行数据，但是实际上由于处理`j` 是正序遍历处理，导致 `j-1` 的数据早就被第`i`行数据覆盖(此时 `dp[j]` 存储 `dp[i][j-1]` )，这就会导致出错。所以需要两行数据(一行存储新数据一行存储旧数据)，优化后代码如下:
+
+```python
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        n = len(s)
+        dp = dp = [[True] * n for _ in range(2)]
+        max_len = 1
+        start = 0
+        for i in range(n-1, -1, -1):
+            #新数据行
+            curr = i % 2
+            #旧数据行
+            prev = (i + 1) % 2
+            for j in range(i + 1, n):
+                if s[i] == s[j]:
+                    dp[curr][j] = dp[prev][j-1]
+                else:
+                    dp[curr][j] = False
+                if dp[curr][j] and j - i + 1 >= max_len:
+                    max_len = j - i + 1
+                    start = i
+                    
+        return s[start:start + max_len]
+```
+
+上面代码是老熟人，不是今天的主角，今天的主角在官解里面，官解提供另外两种解题方法，学习一下。
+
+首先根据上面动态规划的状态转移流程，其实不难分析出上述动态规划的求解过程实际上就是一下三条:
+
+```bash
+# 以(i,j)为中心
+(i,j)<-(i+1,j-1)<-(i+2,j-2)<-(i+3,j-3)
+# 以 i 为中心
+()<-(i)<-(i-1,i+1)<-(i-2,i+2)
+# 以 j 为中心(i!=j)(可以与以 i 为中心的情况归为一类)
+()<-(j)<-(j-1,j+1)<-(j-2,j+2)
+```
+
+那么显然可以直接遍历`i`，然后按照上述步骤深度优先遍历求解，代码如下:
+
+```python
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        def expand_around_center(left: int, right: int) -> int:
+            while left >= 0 and right < len(s) and s[left] == s[right]:
+                left -= 1
+                right += 1
+            return right - left - 1
+        
+        max_len = 1
+        start = 0
+
+        for i in range(len(s)):
+            len1 = expand_around_center(i, i)
+            len2 = expand_around_center(i, i + 1)
+            if max_len < (t := max(len1, len2)):
+                max_len = t
+                # (max_len-1)//2其实就是后面Manacher算法中的臂长
+                start = i - (max_len - 1) // 2
+        
+        return s[start:start + max_len]
+```
+
+下面就是今天的主角:Manacher 算法,其实若是学过 KMP 算法(代码忘得差不多，但还好原理记得)的话就不难理解，本质上就是利用对称性而已。今天的刷题时间已经超时，还有其他任务，解题日记明天补…
 
