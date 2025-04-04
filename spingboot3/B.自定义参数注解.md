@@ -1,0 +1,113 @@
+##### 引言
+
+在毕设中实现物联网和springboot通信时，存在这样一个需求:由于物联网设备的功耗问题和网络问题，经可能的缩短数据，提高传输数据的效率。因此往往需要将数组拼接成字节流进行传输(不含参数名称)，而后端拿到字节流后需要手动根据约定拆分字节流转换为对应数据。
+
+<img src="./assets/image-20250403152414287.png" alt="image-20250403152414287" style="zoom:80%;" />
+
+编写一个自定义注解，用于标注字段的长度和类型等
+
+```java
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.TYPE})
+public @interface BinaryField {
+    //字段优先级,优先级越小越先解析
+    int order();
+
+    //字段字节长度,基本类型可自动推导
+    int length() default -1;
+
+    //数据类型
+    DataType type() default DataType.AUTO;
+
+    //是否为嵌套对象
+    boolean nested() default false;
+
+    //嵌套对象类型,nested=true时生效
+    Class<?> nestedType() default Void.class;
+
+    //特殊格式说明,如时间戳格式
+    String format() default "";
+
+    //字节序,默认大端序
+    String byteOrder() default "BIG_ENDIAN";
+
+    enum DataType {
+        AUTO,
+        BYTE,
+        SHORT,
+        INT,
+        LONG,
+        FLOAT,
+        DOUBLE,
+        STRING,
+        TIMESTAMP,
+        BOOLEAN,
+        ArrAY,
+        //自定义类型
+        CUSTOM
+    }
+}
+```
+
+注解参数校验是否可以通过实现 ConstraintValidator 实现？
+
+
+
+
+
+
+
+![image-20250403163802378](./assets/image-20250403163802378.png)
+
+上述解析器可定是存在不足的，基本数据类型如何处理？？？
+
+
+
+
+
+```yaml
+  kafka:
+    image: bitnami/kafka:${KAFKA_VERSION}
+    container_name: kafka
+    ports:
+      - "${KAFKA_PORT}:9092"
+    environment:
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+    networks:
+      - grid
+```
+
+```yaml
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    volumes:
+      - "/etc/localtime:/etc/localtime"  # 同步宿主机时间
+    networks:
+      - grid
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"  # 使用 Docker 服务名连接
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092  # 监听所有网络接口
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://172.18.43.141:9092  # 动态传入宿主机 IP
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+    depends_on:
+      - zookeeper
+    networks:
+      - grid
+```
+
