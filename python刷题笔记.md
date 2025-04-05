@@ -765,8 +765,9 @@ def lcm(a, b):
    1. 不一定是从一个固定转态转移到下一个转态，也就是一个问题肯能依赖一圈问题的解。[132. 分割回文串 II(2025.3.2)](https://leetcode.cn/problems/palindrome-partitioning-ii)
    2. <font color=red>不一定是单个转态集合之间的转变，可能是不同转态集合之前来回切换。</font>[2712. 使所有字符相等的最小成本(2025.3.17)](https://leetcode.cn/problems/minimum-cost-to-make-all-characters-equal)
    3. 有是可以对存储数组进行优化，注意转态的构建顺序。[2712. 使所有字符相等的最小成本(2025.3.17)](https://leetcode.cn/problems/minimum-cost-to-make-all-characters-equal)
-   4. 正向动态规划有点难，可以考虑反向动态(将问题的求解过程逆向分析)。[2140. 解决智力问题(2025.4.1)](https://leetcode.cn/problems/solving-questions-with-brainpower)
-   5. 若是后一个状态受限于前面若干转态，但是又无法具体分析出具体是哪若干个状态，可以试着在前面若干状态时顺便处理该状态。[2140. 解决智力问题(2025.4.1)](https://leetcode.cn/problems/solving-questions-with-brainpower)
+   4. 进行空间优化时，一定要注意旧数据在使用前被新数据覆盖的情况,[5. 最长回文子串(2015.4.3)](https://leetcode.cn/problems/longest-palindromic-substring)。
+   5. 正向动态规划有点难，可以考虑反向动态(将问题的求解过程逆向分析)。[2140. 解决智力问题(2025.4.1)](https://leetcode.cn/problems/solving-questions-with-brainpower)
+   6. 若是后一个状态受限于前面若干转态，但是又无法具体分析出具体是哪若干个状态，可以试着在前面若干状态时顺便处理该状态。[2140. 解决智力问题(2025.4.1)](https://leetcode.cn/problems/solving-questions-with-brainpower)
 
 
 
@@ -930,6 +931,9 @@ def lcm(a, b):
           return dp.get(amount, -1)
       ```
 
+7. 经验之谈:
+   1. 进行空间优化时，一定要注意旧数据在使用前被新数据覆盖的情况,[5. 最长回文子串(2015.4.3)](https://leetcode.cn/problems/longest-palindromic-substring)。
+
 
 > - 状态依赖范围：若仅依赖前几个状态 → 滚动数组或变量复用。
 > - 状态维度：高维问题(如TSP)→ 状态压缩。
@@ -989,4 +993,12 @@ def lcm(a, b):
 5. 经验之谈:
 
    1. 合理设置递归函数的参数，也就是状态参数，从而充分利用缓存。[2140. 解决智力问题(2025.4.1)](https://leetcode.cn/problems/solving-questions-with-brainpower)
+
+
+
+
+
+
+
+##### 逻辑运算和位运算
 

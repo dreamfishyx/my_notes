@@ -3431,5 +3431,185 @@ class Solution:
         return s[start:start + max_len]
 ```
 
-下面就是今天的主角:Manacher 算法,其实若是学过 KMP 算法(代码忘得差不多，但还好原理记得)的话就不难理解，本质上就是利用对称性而已。今天的刷题时间已经超时，还有其他任务，解题日记明天补…
+下面就是今天的主角:Manacher 算法,其实若是学过 KMP 算法(代码忘得差不多，但还好原理记得)的话就不难理解，本质上就是利用对称性而已。<br><img src="./assets/image-20250405132019181.png" alt="image-20250405132019181" style="zoom:75%;" />
+
+首先只讨论奇数的情况，官方定义一个新概念臂长用以表示中心扩展算法向外扩展的长度，例如一个位置的最大回文字符串长度为 `2 * length + 1` ，则其臂长为 `length`。则根据上面的图示不难理解，由对称可知:(直接抄官解)如果位置 `j` 的臂长为 `length`，并且有 `j + length > i`，当在位置 `i` 开始进行中心拓展时，我们可以先找到 `i` 关于 `j` 的对称点 `2 * j - i`。那么如果点 `2 * j - i` 的臂长等于 `n`，我们就可以知道，点 `i` 的臂长至少为 `min(j + length - i, n)`。那么我们就可以直接跳过 `i` 到 `i + min(j + length - i, n)` 这部分，从 `i + min(j + length - i, n) + 1` 开始拓展。
+
+而对于长度为偶数的回文字符串，向字符串的头尾以及每两个字符中间添加一个特殊字符 `#`，比如字符串 `aaba` 处理后会变成 `#a#a#b#a#`。那么原来的回文字符串会变成长度为奇数的回文字符串，原理也很简单，就是 `2n+1` 一定是奇数。直接开始写代码:
+
+```python
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+
+        def expand_around_center(left: int, right: int) -> int:
+            while left >= 0 and right < len(s) and s[left] == s[right]:
+                left -= 1
+                right += 1
+            # 不要忘记减 2
+            return (right - left - 2) // 2
+        
+        # 手臂可达位置、j
+        arm_area, j = -1, -1
+        # 记录每个位置的最大臂长
+        arms = []
+        # 处理奇偶回文串
+        s = '#' + '#'.join(s) + '#'
+        # 注意考虑原本s为空串的情况,此时经过上一步处理后s变成了'##'
+        # 需要保证这种情况不被选中,但是题目说明s不会是空串
+        end, start = 1, 0
+
+        for i in range(len(s)):
+            if arm_area > i:
+                # i的镜像位置
+                mirror_i = 2 * j - i
+                # 至少臂长
+                arm_at_least = min(arms[mirror_i], arm_area - i)
+                # 继续扩展
+                cur_arm_len = expand_around_center(i - arm_at_least, i + arm_at_least)
+            else:
+                # 直接使用镜像位置的手臂长度
+                cur_arm_len = expand_around_center(i, i)
+            
+            # 维护手臂可达位置
+            if i + cur_arm_len > arm_area:
+                arm_area = i + cur_arm_len
+                j = i
+
+            # 更新arms数组
+            arms.append(cur_arm_len)
+            if 2 * cur_arm_len + 1 > end - start + 1:
+                # 更新手臂可达位置
+                start = i - cur_arm_len
+                end = i + cur_arm_len
+        # 去掉#号并返回
+        return s[start+1:end:2]
+```
+
+> 其实这里我有一个疑问，那就是怎样跳的更多(说白了就是贪)？按照官方代码中不断维护最长`j+length`？但是这样就会导致对称中心`j`发生变化，进而影响到`2j-i`和`n`,进而影响可跳过部分长度(会不会`n`变短导致跳过部分变短?)。当然这样改肯定是可以解决问题，但是其中效率问题呢？会不会有我所想的这种情况？其实这时候可以反向考虑，在上面的条件下，不妨提出这样一条假设: 假设我是上帝，我已经知道对于 `i` 而言其臂长为 `m`,对于 `2j-i` 而言臂长为 `n `,那么什么情况下，我可以跳过的部分最长呢？其实就是`j+length-i`最长的时候，不妨分情况讨论一下:
+>
+> - 若是`j+length-i > m`,那么根据对称我就知道`n=m`(其实就是反过来，根据 `i` 推 `2j-i` ,二者是相互的)，此时完美跳跃(不妨记最符合贪心策略的跳跃称为完美跳跃,其实就是尽可能多跳过)。
+> - 若是`j+length-i=m`,那么我就知道`n>=m`,此时完美跳跃。
+> - 若是`j+length-i<m`,那么完美跳跃其实应该是`j+length-i`,同时根据对称我就知道 `n>=j+length-i` ,那么要想跳的最贪心(完美跳跃)，那必然就是`j+length-i`最大的时候，也就是`j+length`最大的时候。
+>
+> 当然，根据上面分析，也就知道一定存在:`j+length`越大，跳跃越趋向乃至最后成为完美跳跃。
+
+> 当然实际上面的代码与官方代码存在差异，实际上可以知道处理后的字符串得到的回文串的长度一定是一个奇数、且开头末尾都是 `#`。也就是不同回文串长度相差 2 的倍数关系，所以 `2 * cur_arm_len + 1 > end - start + 1` 和`2 * cur_arm_len + 1 > end - start` 效果是一样的(但是会将长度相等的情况视作 True,可能导致找到的结果和期望的结果不一样，但是无伤大雅)，`s[start+1:end:2]` 和 `s[start+1:end+1:2]` 也是一样的。
+
+
+
+
+
+
+
+##### :deciduous_tree:4.4
+
+[1123. 最深叶节点的最近公共祖先](https://leetcode.cn/problems/lowest-common-ancestor-of-deepest-leaves)
+
+首先要读懂题目，其次知道啥叫祖先:
+
+- 若节点 B 的直接上级是节点 A，则 A 是 B 的直接祖先。
+- 若节点 A 位于从节点 B 到根节点的路径上(即 A 是 B 的父节点、祖父节点等)，则 A 是 B 的间接祖先。
+- 某些定义中，节点 B 也被认为是自身的祖先(例如本题)。
+
+那么开始分析一下思路，由于问题和深度挂钩，最好就是从叶子节点开始向上遍历，这种形式最优的就是递归了吧。其次需要理解一下啥叫最深的叶节点的最近公共祖先，其实就是**所有**最深叶子节点的公共祖先。而根据上面祖先节点的解释，其实就是找 所有的**最深叶子节点到根节点**的路径 的最终汇集点。
+
+```python
+from typing import Optional
+
+class Solution:
+    def lcaDeepestLeaves(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
+        def dfs(node: Optional[TreeNode]) -> tuple[int, Optional[TreeNode]]:
+            if not node:
+                return 0, None
+            left_depth, left_lca = dfs(node.left)
+            right_depth, right_lca = dfs(node.right)
+            if left_depth == right_depth:
+                # 二者深度相同，返回当前节点作为汇集点
+                return left_depth + 1, node
+            elif left_depth > right_depth:
+                # 左子树更深，返回左子树作为汇集点
+                return left_depth + 1, left_lca
+            else:
+                # 右子树更深，返回右子树作为汇集点
+                return right_depth + 1, right_lca
+
+        _, lca = dfs(root)
+        # 返回最终的汇集点
+        return lca
+```
+
+
+
+
+
+
+
+
+
+##### :four_leaf_clover:4.5
+
+[1863. 找出所有子集的异或总和再求](https://leetcode.cn/problems/sum-of-all-subset-xor-totals)
+
+今天的题也是比较妙的，首先作为选择问题能想到的肯定还是 dfs，每个元素存在选中和不选两种状况，代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def subsetXORSum(self, nums: List[int]) -> int:
+        n ,total_sum = len(nums), 0
+
+        def dfs(index: int, xor_sum: int) -> None:
+            nonlocal total_sum
+            if index == len(nums):
+                total_sum += xor_sum
+                return
+            # 选中当前元素
+            dfs(index + 1, xor_sum ^ nums[index])
+            # 不选中当前元素
+            dfs(index + 1, xor_sum)
+
+        dfs(0, 0)
+        return total_sum
+```
+
+> Python 中，当你在内部函数中为外部变量赋值时，该变量会被视为内部函数的局部变量，而不是外部变量。同样的，当在函数中查找一个变量时，查找顺序是从内到外的，现在函数中找，找不到再去上层。…基础部分…快忘得差不多了…
+
+下面是官解提供的另外解法，感觉很妙(尤其是第一种使用二进制标记的方式)，可以学习一下。首先，根据上面的内容不难知道每个元素存在选和不选两种情况，不妨用一位二进制表示这种情况(1表示选中，0表示不选)。那么 n 个元素的选择情况可以使用 n 位二进制表示，其对应数值范围为$[0,2^{n-1}]$，其中每一个数值表示一种选择情况，例如 `3=...00011` 表示选第 1、2 个元素。那么就可以遍历这些数值$[0,2^{n-1}]$，根据其二进制来选择元素，代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def subsetXORSum(self, nums: List[int]) -> int:
+        n = len(nums)
+        ans = 0
+        for i in range(1 << n):
+            xor_sum = 0
+            for j in range(n):
+                # 第 j 位是否为 1
+                if i & (1 << j):
+                    xor_sum ^= nums[j]
+            ans += xor_sum
+        return ans
+```
+
+> 这个方法虽然难想，但是对于有点计算机基础的人，还是比较好理解的。感觉是一个很妙的思路，有一种二进制特有的美感！！！
+
+后面这一种方式更难想，不妨思考这样一件事，对于数组中所有元素的某一位，只存在两种可能:第一种，所有元素该位都为 0；第二种，至少有一个元素该位为 1。那么对于第一种情况，无论如何选择异或的结果都是0；而对于第二种情况，其实其异或结果 0 和 1 各占一半.接下来不妨叙述一下第二种:假设存在 m 个元素改位为 1，那么剩余 n-m 就是 0。其实对一位二进制于异或而言，其结果其实就是求和后判断奇偶性，结果为奇数就是 1，结果为偶数就是 0。那么其实结果就只取决于这 m 个 1,那么根据上一种方法的思路，其可能结果集$[0,2^{m-1}]$显然奇偶各一半。那么根据上述分析，不难推导出这样一个结论，对于全 0 的情况，所有数组子集的异或和在该位都是 0；对于存在至少一个 1 的情况下，所有数组子集的异或和在该位 0 和 1 各占一半(其实就是$2^{n-1}$个)。所以下面代码就很好理解:
+
+```python
+from typing import List
+
+class Solution:
+    def subsetXORSum(self, nums: List[int]) -> int:
+        n, ans= len(nums), 0
+        
+        for num in nums:
+            ans |= num
+        
+        return ans * (1 << (n - 1))
+```
+
+> 也是一种很妙的方法，我好像渐渐能感受到二进制那种区别于十进制的美感了……。或许……思维本就是浪漫送给我们的出生贺礼，不然为什么我们能创造和感受到这么优美的东西呢？(我们一边用理性的手术刀解剖思维的物质基础，一边又用这同一个思维为晚霞流泪。就像海豚永远意识不到自己游泳的优美，而人类却能在认知自我的同时，为这份认知即兴作诗。这种自指般的浪漫，或许才是意识诞生时最奢侈的礼物。———deepseek)
 
