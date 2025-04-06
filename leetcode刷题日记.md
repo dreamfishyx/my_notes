@@ -3613,3 +3613,89 @@ class Solution:
 
 > 也是一种很妙的方法，我好像渐渐能感受到二进制那种区别于十进制的美感了……。或许……思维本就是浪漫送给我们的出生贺礼，不然为什么我们能创造和感受到这么优美的东西呢？(我们一边用理性的手术刀解剖思维的物质基础，一边又用这同一个思维为晚霞流泪。就像海豚永远意识不到自己游泳的优美，而人类却能在认知自我的同时，为这份认知即兴作诗。这种自指般的浪漫，或许才是意识诞生时最奢侈的礼物。———deepseek)
 
+
+
+
+
+
+
+
+
+##### 4.6
+
+[368. 最大整除子集](https://leetcode.cn/problems/largest-divisible-subset)
+
+其实就是一个公倍数的问题，在数组元素有序的前提下，若是已经找到 [a,b] ，即说明 a=nb(n>1)。此时若是 c 需要加入其中，则需要满足 c=mb(m>1) 且 c=la(l>1) ,其实根据前一个条件就可以推断出:上述两个条件其实只需要 c=mb(m>1) 即可(条件存在包含关系)。那么其实就可以知道一件事，那就是在有序的情况下，记 dp[i] 为 [:i] 的最大整除子集，那么 `dp[i]=dp[j]` (其中`nums[j] % nums[i]=0`且`j<i`),代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def largestDivisibleSubset(self, nums: List[int]) -> List[int]:
+        nums.sort()
+        n = len(nums)
+        # 记录[0, i]的最大整除子集的长度
+        dp = [1] * n
+        # 记录最长整除子集的最后一个元素的索引
+        max_len,last_index = 0,0
+        for i in range(n):
+            for j in range(i):
+                if nums[i] % nums[j] == 0:
+                    dp[i] = max(dp[i], dp[j] + 1)
+                    if dp[i] > max_len:
+                        max_len = dp[i]
+                        last_index = i
+        
+        # 反向查找最大整除子集,(坑:如何判断元素是否在子集中?)
+        result = []
+        result.append(nums[last_index])
+        for i in range(last_index - 1, -1, -1):
+            if nums[last_index] % nums[i] == 0  and dp[i] == max_len - 1:
+                max_len -= 1
+                result.append(nums[i])
+                last_index = i
+        # return result[::-1]
+        return result
+```
+
+> 上述代码还存在一个小问题，那就是最后如何找出我选择的元素？通过dp[i]判断?显然不行，这会存在大量重复。从后向前判断 nums[i] % nums[j] ?其实也不行，不同整除子集中其实是存在交集的，例如 [1,3,6,8,48] 的最大整除子集 [1,3,6,48] ,在这种判断方式下会从48->8->1。所以需要上述两种方式结合起来，保证位于当前最大整除字集。
+
+感觉上述代码可以用空间换时间，在最后反向查找最大整除子集是使用遍历，其实可以在前面维护一个前驱数组，记录当前元素的前驱，从而避免遍历:
+
+```python
+from typing import List
+
+class Solution:
+    def largestDivisibleSubset(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        if n <= 1:
+            return nums
+        
+        nums.sort()
+        dp = [1] * n
+        max_len, last_index = 1, 0
+        
+        # 构建前驱路径
+        prev = [-1] * n
+        
+        for i in range(1, n):
+            for j in range(i):
+                # 当新的子集长度更大时，更新前驱索引
+                if nums[i] % nums[j] == 0 and dp[j] + 1 > dp[i]:
+                    dp[i] = dp[j] + 1
+                    prev[i] = j
+            if dp[i] > max_len:
+                max_len = dp[i]
+                last_index = i
+        
+        # 重建最大整除子集
+        result = []
+        while last_index != -1:
+            result.append(nums[last_index])
+            last_index = prev[last_index]
+            
+        # return result[::-1]
+        return result
+```
+
+emmm……结果显示略快一点…<br><img src="./assets/image-20250406142410304.png" alt="image-20250406142410304" style="zoom:80%;" />
