@@ -1,6 +1,6 @@
 #### vscode配置cpp
 
-1.   安装[mingw-64]([Downloads - MinGW-w64](https://www.mingw-w64.org/downloads/))<br><img src="./assets/image-20240229205310438.png" alt="image-20240229205310438" style="border: 1px solid black; border-radius: 10px; zoom: 80%;" />
+1.   安装[mingw-64](https://www.mingw-w64.org/downloads/)<br><img src="./assets/image-20240229205310438.png" alt="image-20240229205310438" style="border: 1px solid black; border-radius: 10px; zoom: 80%;" />
 
 2.   参考教程[VSCode配置C/C++环境 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/87864677)。
 

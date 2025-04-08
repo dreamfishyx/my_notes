@@ -835,7 +835,7 @@ return { 'gen740/SmoothCursor.nvim',
                 texthl = "SmoothCursor",  -- 设置光标的高亮组
                 fancy = {
                     enable = true,  -- 启用Fancy效果
-                    head = { cursor = "●", texthl = "SmoothCursor" },  -- 设置头部样式
+                    head = { cursor = "▶", texthl = "SmoothCursor" },  -- 设置头部样式
                     body = {
                         { cursor = "●", texthl = "SmoothCursorBody" },
                         { cursor = "●", texthl = "SmoothCursorBody" },
@@ -1220,7 +1220,7 @@ return {
                 },
             })
     end
-},
+}
 ```
 
 `lazy.nvim`自带一个`indent-blankline`,leetcode正常显示:

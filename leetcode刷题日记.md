@@ -3621,7 +3621,7 @@ class Solution:
 
 
 
-##### 4.6
+##### :sleepy:4.6
 
 [368. 最大整除子集](https://leetcode.cn/problems/largest-divisible-subset)
 
@@ -3699,3 +3699,155 @@ class Solution:
 ```
 
 emmm……结果显示略快一点…<br><img src="./assets/image-20250406142410304.png" alt="image-20250406142410304" style="zoom:80%;" />
+
+
+
+
+
+
+
+
+
+##### :star:4.7
+
+[416. 分割等和子集](https://leetcode.cn/problems/partition-equal-subset-sum)
+
+风光一时的 dfs+记忆化搜索在这儿只能算下乘之法，哎…代码如下:
+
+```python
+from functools import cache
+from typing import List
+
+class Solution:
+    def canPartition(self, nums: List[int]) -> bool:
+        @cache
+        def dfs(i: int, target: int) -> bool:
+            if target == 0:
+                return True
+            if i >= len(nums) or target < 0:
+                return False
+            return dfs(i + 1, target) or dfs(i + 1, target - nums[i])
+        
+        total = sum(nums)
+        if total % 2 != 0:
+            return False
+        return dfs(0, total // 2)
+```
+
+坏了，今天算是学到真本事了,先不去管官解说的啥背包问题，先理解这样一点(评论区学的):
+
+<font color=red>对于一个问题，若是 dp 没有思路，可以先尝试使用 dfs ，然后观察 dfs 的参数和调用方式，这两个一般会涉及到子问题和状态转移，然后进一步分析是否重复搜索并改为记忆化搜索，最后根据前面的思考最终改写为 dp 。</font>
+
+如上根据`dfs(i: int, target: int)`制定`dp[i][target]`表示从 i 元素开始后面是否可以满足`target`,且其状态转移方程为`dp[i][target]=dp[i+1][target] or dp[i+1][target-nums[i]]`，这动态规划就出来了。但是上面这样写有点变扭，反过来定义`dp[i][target]`表示前[:i]元素是否可以满足 `target` 的条件，并且由状态转移方程`dp[i][target]=dp[i-1][target] or dp[i-1][target-nums[i]]`,当然还是有一些细节问题需要注意…代码如下:
+
+```python
+from typing import List
+
+class Solution:
+    def canPartition(self, nums: List[int]) -> bool:   
+        total = sum(nums)
+        if total % 2 != 0:
+            return False
+        
+        n = len(nums)
+        if n == 1:
+            # 若是只有一个元素，直接返回False
+            return False
+        
+        target = total // 2
+        dp = [[False] * (target + 1) for _ in range(n)]
+        for i in range(n):
+            dp[i][0] = True
+            if nums[i] > target:
+                # 若是存在元素大于target，直接返回False
+                return False
+            elif nums[i] == target:
+                # 若是存在元素等于target，直接返回True
+                return True
+        
+        # 若是nums[0] > target 咋办？会数组越界，上述处理的由来
+        dp[0][nums[0]] = True
+        for i in range(1, n):
+            for j in range(1, target + 1):
+                dp[i][j] = dp[i - 1][j]
+                if j >= nums[i]:
+                    dp[i][j] = dp[i][j] or dp[i - 1][j - nums[i]]
+        return dp[n-1][target]
+```
+
+当然又要开始最喜欢的空间优化环节，由于上面`dp[i][tagert]`的计算依赖于`dp[i-1][...]`,显然直接滚动数组优化，但是为了防止新数据数据覆盖问题，j需要改为逆序遍历:
+
+```python
+from typing import List
+
+class Solution:
+    def canPartition(self, nums: List[int]) -> bool:   
+        total = sum(nums)
+        if total % 2 != 0:
+            return False
+        
+        n = len(nums)
+        if n == 1:
+            return False
+        
+        target = total // 2
+        dp = [False] * (target + 1) 
+        for i in range(n):
+            if nums[i] > target:
+                return False
+            elif nums[i] == target:
+                return True
+        
+        dp[0] = True
+        dp[nums[0]] = True
+        for i in range(1, n):
+            # for j in range(target, -1, -1):
+            #     if j >= nums[i]:
+            #         dp[j] |= dp[j - nums[i]]
+
+            # 若是j< nums[i]，则dp[j]无需更新
+            for j in range(target, nums[i] - 1, -1):
+                dp[j] |= dp[j - nums[i]]
+        return dp[target]
+```
+
+> 使用滚动数组优化后，最后的返回值不要忘记改回一维数组:sob:。
+
+其实最刚开始，这道题是打算用贪心的,凭感觉贪心了两次都没成功。一次是将最大的和最小的放一起，另一次是将最大的几个分成两个集合并尽可能的位置两边平衡，但最终都被证实是错误的，没办法最后只能 dfs …,但是好在学到了新东西。至于背包问题……先暂时搁置吧……
+
+
+
+
+
+
+
+
+
+##### 4.8
+
+[3396. 使数组元素互不相同所需的最](https://leetcode.cn/problems/minimum-number-of-operations-to-make-elements-in-array-distinct)
+
+其实只要当前元素和后面元素相同，则当前元素和其前面元素一定需要被删除，显然只需要找到最后一个相同的位置就行，故而直接反向遍历就行:
+
+```python
+from typing import List
+
+class Solution:
+    def minimumOperations(self, nums: List[int]) -> int:
+        res = 0
+        n = len(nums)
+        unique = set()
+        for i in range(n-1,-1,-1):
+            if nums[i] in unique:
+                return i // 3 + 1
+            else:
+                unique.add(nums[i])
+        return 0
+```
+
+困死了:sleepy:……​
+
+
+
+
+
